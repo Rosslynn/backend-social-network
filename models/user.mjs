@@ -20,9 +20,20 @@ const userSchema = new Schema({
     },
     email: {
         type: String,
-        required: true,
+        required: [true, 'El correo electrónico es obligatorio'],
         unique: true,
         trim:true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    followers: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    picture:{
+        type:String
     },
     createdAt: {
         type: Date,
