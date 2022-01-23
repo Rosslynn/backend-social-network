@@ -9,19 +9,26 @@ const userSchema = new Schema({
     name: {
         first: {
             type: String,
+            trim:true,
             required: [true, 'Los nombres son obligatorios']
         },
         last: {
             type: String,
+            trim:true,
             required: [true, 'Los apellidos son obligatorios']
         }
     },
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim:true
     },
     createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
         type: Date,
         default: Date.now
     }
