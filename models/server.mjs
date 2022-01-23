@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 
 import main from "../database/config.mjs";
+import userRouter from "../routes/user.mjs";
 
 class Server {
 
@@ -31,6 +32,7 @@ class Server {
         this.app.use(cors());
         this.app.use(morgan('tiny')); 
         this.app.use(express.json());
+        this.app.use(express.urlencoded({ extended:true }));
         this.app.use(express.static(path.join(__dirname, '../public')));
     }
 
@@ -41,7 +43,7 @@ class Server {
     }
 
     routes() {
-        
+        this.app.use(this.paths.users, userRouter);
     }
 
     async databaseConnection() {
