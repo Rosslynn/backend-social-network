@@ -1,16 +1,13 @@
-import { User } from "../models/index.mjs";
+import { User, Role } from "../models/index.mjs";
 
 const newUser = async (req, res) => {
     try {
-        const user = new User({
-            name: {
-                first: req.body.name.first,
-                last:req.body.name.last
-            },
-            email:req.body.email
-        });
+        const { role, followers, picture, name, email, password  } = req.body;
+        const user = new User({ name, email, password });
         await user.save();
 
+        //TODO: Generar JWT y validación del mismo
+     
         return res.status(201).json({
             user
         });

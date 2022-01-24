@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 
 /**
  * Middleware para validar si existen errores en los campos requeridos en la petición
- * @returns - Errores o continua de lo contrario
+ * @returns - Error si algún campo específicado no cumple los requisitos de lo contrario continua el flujo
  */
 const validateFields = (req, res, next) => {
     const errors = validationResult(req);
