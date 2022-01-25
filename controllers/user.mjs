@@ -1,3 +1,4 @@
+import generateJWT from "../helpers/generate-jwt.mjs";
 import { User, Role } from "../models/index.mjs";
 
 const newUser = async (req, res) => {
@@ -5,10 +6,12 @@ const newUser = async (req, res) => {
         const { role, followers, picture, name, email, password  } = req.body;
         const user = new User({ name, email, password });
         await user.save();
-
-        //TODO: Generar JWT y validación del mismo
+        
+        const token = await generateJWT(user.id);
      
         return res.status(201).json({
+            ok:true,
+            token,
             user
         });
         
