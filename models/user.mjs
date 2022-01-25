@@ -37,6 +37,10 @@ const userSchema = new Schema({
         uppercase:true,
         default:'USER'
     },
+    status: {
+        type:Boolean,
+        default:true
+    },
     picture:{
         type:String
     },

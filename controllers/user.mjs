@@ -3,10 +3,10 @@ import { User, Role } from "../models/index.mjs";
 
 const newUser = async (req, res) => {
     try {
-        const { role, followers, picture, name, email, password  } = req.body;
+        const { role, followers, picture, status, name, email, password  } = req.body;
         const user = new User({ name, email, password });
         await user.save();
-        
+
         const token = await generateJWT(user.id);
      
         return res.status(201).json({
