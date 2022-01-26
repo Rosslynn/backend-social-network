@@ -8,6 +8,8 @@ const newUser = async (req, res) => {
     try {
         const { role, followers, picture, status, name, email, password  } = req.body;
         const user = new User({ name, email, password });
+        // Encriptar la contraseña
+        await user.hashPassword(password);
         await user.save();
 
         const token = await generateJWT(user.id);
@@ -29,6 +31,9 @@ const newUser = async (req, res) => {
     }
 }
 
+/**
+ * Middleware para crear obtener la lista de usuarios en la base de datos
+ */
 const getUsers = async (req,res ) => {
     try {
       const { from = 0, limit = 20 } = req.query;
@@ -54,7 +59,34 @@ const getUsers = async (req,res ) => {
         })
     }
 }
+
+/**
+ * Middleware para iniciar sesión
+ */
+const userLogin = async (req,res ) => {
+    try {
+
+        const user = req.user;
+        const token = await generateJWT(user.id);
+        return res.status(200).json({
+            ok:true,
+            token,
+            user
+        });
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        })
+    }
+}
+
+
 export {
     newUser,
-    getUsers
+    getUsers,
+    userLogin
 }

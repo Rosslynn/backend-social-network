@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
@@ -59,9 +60,28 @@ userSchema.virtual('fullName').get(function() {
 });
 
 userSchema.methods.toJSON = function () {
-    const {__v, _id, ...user} = this.toObject();
+    const {__v, _id, password, ...user} = this.toObject();
     return user;
 }
+
+//Hash password
+userSchema.methods.hashPassword = async function (password) {
+    try {
+        this.password = await bcrypt.hash(password, 10);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//Compare password
+userSchema.methods.comparePasswords = async function (plainTextPassword) {
+    try {
+        return bcrypt.compare(plainTextPassword, this.password);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 const User = model('User', userSchema);
 
