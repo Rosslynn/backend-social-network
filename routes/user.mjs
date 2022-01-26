@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { check, body } from "express-validator";
-import { newUser } from "../controllers/user.mjs";
+import { body } from "express-validator";
+import { newUser, getUsers } from "../controllers/user.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
+import verifyToken from "../middlewares/verify-token.mjs";
 
 const router = Router();
 
@@ -15,6 +16,11 @@ router.post('/', [
     body('password','La contraseña es obligatoria, el mìnimo de caracteres es 6.').isLength(6),
     body('repeat_password','Repetir contraseña debe ser igual a contraseña.').exists().custom((repeat_password, { req }) => repeat_password === req.body.password),
     validateFields
-], newUser)
+], newUser);
+
+/**
+ * Petición para obtener la lista de usuarios
+*/
+router.get('/', getUsers)
 
 export default router;
