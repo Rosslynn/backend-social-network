@@ -127,17 +127,17 @@ const deleteUser = async (req, res) => {
     try {
         const { name, ...rest  } = req.body;
         const { id } = req.params;
-        const user = await User.findByIdAndUpdate(id, { name } , { new: true});
-        // Encriptar la contraseña
-        await user.hashPassword(password);
-        await user.save();
+        const dbUser = await User.findByIdAndUpdate(id, { name } , { new: true });
+        dbUser.updatedAt =  new Date();
+        dbUser.markModified('updatedAt');
+        await dbUser.save();
 
-        const token = await generateJWT(user.id);
+        const token = await generateJWT(dbUser.id);
     
-        return res.status(201).json({
+        return res.status(200).json({
             ok:true,
             token,
-            user
+            user:dbUser
         });
         
     } catch (error) {

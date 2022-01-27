@@ -78,7 +78,7 @@ const findExistingUser = async (id) => {
 }
 /**
  * Middleware para verificar que el usuario cumpla con los roles enviados como parámetro
- * @param  {...string} roles - Roles permitidos 
+ * @param  {...string} roles - Roles permitidos (en mayúsculas)
  * @returns - Error o continua el flujo
  */
 const hasRole = (...roles) => {

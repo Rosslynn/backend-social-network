@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body, param } from "express-validator";
 import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo } from "../controllers/user.mjs";
-import { validateEmailAndPassword, findUsedEmail, findExistingUser } from "../middlewares/db-validators.mjs";
+import { validateEmailAndPassword, findUsedEmail, findExistingUser, hasRole } from "../middlewares/db-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
 
@@ -38,16 +38,24 @@ router.post('/login', [
 //Actualizar información básica del usuario
 router.patch('/:id', [
     verifyToken,
-    param('id','El id del usuario a editar es obligatorio y debe ser un id de mongo.').isMongoId(),
+    hasRole('ADMIN','USER'),
+    param('id','El id del usuario a editar es obligatorio y debe ser un id de mongo.').isMongoId().custom(findExistingUser),
     body('name.first','Los nombres son obligatorios').notEmpty(),
     body('name.last','Los apellidos son obligatorios').notEmpty(),
     validateFields
 ], updateBasicInfo)
 
+//TODO: Actualizar correo
+
+//TODO: Actualizar foto de perfil
+
+//TODO: Actualizar rol (debe ser admin para cambiarlo) por defecto es User
+
 //Borrar usuario (poner estado inactivo)
 router.delete('/:id', [
     verifyToken,
-    param('id','El id del usuario a borrar es obligatorio y debe ser un id de mongo.').isMongoId(),
+    hasRole('ADMIN','USER'),
+    param('id','El id del usuario a borrar es obligatorio y debe ser un id de mongo.').isMongoId().custom(findExistingUser),
     validateFields
 ], deleteUser);
 export default router;
