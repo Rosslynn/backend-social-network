@@ -57,7 +57,7 @@ const validateEmailAndPassword = async (req, res , next ) => {
             ok:false,
             msg:'Algo ha salido mal, contacta con el administrador para solucionar este problema.',
             error
-        })
+        });
     }
 } 
 
@@ -76,10 +76,45 @@ const findExistingUser = async (id) => {
         throw new Error(error);
     }
 }
+/**
+ * Middleware para verificar que el usuario cumpla con los roles enviados como parámetro
+ * @param  {...string} roles - Roles permitidos 
+ * @returns - Error o continua el flujo
+ */
+const hasRole = (...roles) => {
+    return (req, res, next) => {
+        try {
+            if (!req.authenticatedUser) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Se quiere validar el rol sin enviar el token primero.'
+                });
+            }
+
+            if (!roles.includes(req.authenticatedUser.role)) {
+                return res.status(403).json({
+                    ok: false,
+                    msg: `El rol de ${req.authenticatedUser.role} no te permite realiza esta acción, para hacerlo debes tener el rol(es) de ${roles}.`
+                })
+            }
+
+            next();
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                ok: false,
+                msg: 'Algo ha salido mal, contacta con el administrador para solucionar este problema.',
+                error
+            });
+        }
+    }
+}
 
 
 export {
     validateEmailAndPassword,
     findUsedEmail,
-    findExistingUser
+    findExistingUser,
+    hasRole
 }

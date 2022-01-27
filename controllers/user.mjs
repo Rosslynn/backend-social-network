@@ -6,7 +6,7 @@ import { User, Role } from "../models/index.mjs";
  */
 const newUser = async (req, res) => {
     try {
-        const { role, followers, picture, status, name, email, password  } = req.body;
+        const { name, email, password, ...rest} = req.body;
         const user = new User({ name, email, password });
         // Encriptar la contraseña
         await user.hashPassword(password);
@@ -86,7 +86,7 @@ const userLogin = async (req,res ) => {
 /**
  * Middleware para borrar usuario (estado inactivo)
  */
-const deleteUser = async (req,res ) => {
+const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
         const dbUser = await User.findById(id);
@@ -120,9 +120,40 @@ const deleteUser = async (req,res ) => {
     }
 }
 
+/**
+ * Middleware para actualizar la información básica de un usuario en la base de datos
+ */
+ const updateBasicInfo = async (req, res) => {
+    try {
+        const { name, ...rest  } = req.body;
+        const { id } = req.params;
+        const user = await User.findByIdAndUpdate(id, { name } , { new: true});
+        // Encriptar la contraseña
+        await user.hashPassword(password);
+        await user.save();
+
+        const token = await generateJWT(user.id);
+    
+        return res.status(201).json({
+            ok:true,
+            token,
+            user
+        });
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        })
+    }
+}
+
 export {
     newUser,
     getUsers,
     userLogin,
-    deleteUser
+    deleteUser,
+    updateBasicInfo
 }

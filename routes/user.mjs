@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body, param } from "express-validator";
-import { newUser, getUsers, userLogin, deleteUser } from "../controllers/user.mjs";
+import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo } from "../controllers/user.mjs";
 import { validateEmailAndPassword, findUsedEmail, findExistingUser } from "../middlewares/db-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
@@ -35,12 +35,19 @@ router.post('/login', [
     validateEmailAndPassword
 ] , userLogin);
 
+//Actualizar información básica del usuario
+router.patch('/:id', [
+    verifyToken,
+    param('id','El id del usuario a editar es obligatorio y debe ser un id de mongo.').isMongoId(),
+    body('name.first','Los nombres son obligatorios').notEmpty(),
+    body('name.last','Los apellidos son obligatorios').notEmpty(),
+    validateFields
+], updateBasicInfo)
 
-//TODO: Actualizar información del usuario
-
-//TODO: Borrar usuario (poner estado inactivo)
+//Borrar usuario (poner estado inactivo)
 router.delete('/:id', [
-    param('id','El id del usuario a buscar es obligatorio y debe ser un id de mongo.').isMongoId().custom(findExistingUser),
+    verifyToken,
+    param('id','El id del usuario a borrar es obligatorio y debe ser un id de mongo.').isMongoId(),
     validateFields
 ], deleteUser);
 export default router;
