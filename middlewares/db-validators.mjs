@@ -61,9 +61,25 @@ const validateEmailAndPassword = async (req, res , next ) => {
     }
 } 
 
+/**
+ * Función para buscar un usaurio existente en la base de datos
+ * @param {String} id - Identificador del usuario 
+ * @returns Error si no lo encuentra de lo contrario true
+ */
+const findExistingUser = async (id) => {
+    try {
+        const dbUser = await User.findById(id);
+        if (!dbUser) throw new Error(`No se encontró el usuario con id ${id}`);
+        return true;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
 
 
 export {
     validateEmailAndPassword,
-    findUsedEmail
+    findUsedEmail,
+    findExistingUser
 }

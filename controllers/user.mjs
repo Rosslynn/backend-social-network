@@ -13,8 +13,7 @@ const newUser = async (req, res) => {
         await user.save();
 
         const token = await generateJWT(user.id);
-     //TODO: Date types using built-in methods, tell mongoose about the change with doc.markModified('pathToYourDate') before saving.   doc.markModified('dueDate');
-    // doc.save(callback); // works
+    
         return res.status(201).json({
             ok:true,
             token,
@@ -84,9 +83,45 @@ const userLogin = async (req,res ) => {
     }
 }
 
+/**
+ * Middleware para borrar usuario (estado inactivo)
+ */
+const deleteUser = async (req,res ) => {
+    try {
+        const { id } = req.params;
+        const dbUser = await User.findById(id);
+
+        if (!dbUser.status) {
+            return res.status(400).json({
+                ok:false,
+                msg:'El usuario ya se encuentra inactivo'
+            });
+        }
+
+         //Date types using built-in methods, tell mongoose about the change with doc.markModified('pathToYourDate') before saving.
+        dbUser.status = false;
+        dbUser.updatedAt = new Date();
+        dbUser.markModified('updatedAt');
+        await dbUser.save();
+
+        return res.status(200).json({
+            ok:true,
+            msg:`La cuenta de ${dbUser.fullName} a partir de este momento se encuentra inactivo.`
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        })
+    }
+}
 
 export {
     newUser,
     getUsers,
-    userLogin
+    userLogin,
+    deleteUser
 }
