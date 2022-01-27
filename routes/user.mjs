@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, param } from "express-validator";
+import { body, check, param } from "express-validator";
 import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo } from "../controllers/user.mjs";
 import { validateEmailAndPassword, findUsedEmail, findExistingUser, hasRole } from "../middlewares/db-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
@@ -43,10 +43,9 @@ router.patch('/:id', [
     body('name.first','Los nombres son obligatorios').notEmpty(),
     body('name.last','Los apellidos son obligatorios').notEmpty(),
     validateFields
-], updateBasicInfo)
+], updateBasicInfo);
 
 //Actualizar correo
-
 router.patch('/:id/emails', [
     verifyToken,
     hasRole('ADMIN','USER'),
@@ -54,9 +53,7 @@ router.patch('/:id/emails', [
     body('email','El correo electrònico es obligatorio').isEmail().custom(findUsedEmail),
     body('password','La contraseña es obligatoria, el mìnimo de caracteres es 6.').isLength(6),
     validateFields
-], updateBasicInfo)
-
-//TODO: Actualizar foto de perfil
+], updateBasicInfo);
 
 //TODO: Actualizar rol (debe ser admin para cambiarlo) por defecto es User
 
@@ -67,4 +64,5 @@ router.delete('/:id', [
     param('id','El id del usuario a borrar es obligatorio y debe ser un id de mongo.').isMongoId().custom(findExistingUser),
     validateFields
 ], deleteUser);
+
 export default router;

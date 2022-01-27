@@ -3,16 +3,19 @@ import morgan from "morgan";
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
+import fileUpload from "express-fileupload";
 
 import main from "../database/config.mjs";
 import userRouter from "../routes/user.mjs";
+import uploadsRouter from "../routes/upload.mjs";
 
 class Server {
 
     constructor() {
         this.app = express();
         this.paths = {
-            users:'/users'
+            users:'/users',
+            uploads:'/uploads',
         }
         this.port = process.env.PORT || 8080;
 
@@ -33,6 +36,7 @@ class Server {
         this.app.use(morgan('tiny')); 
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended:true }));
+        this.app.use(fileUpload());
         this.app.use(express.static(path.join(__dirname, '../public')));
     }
 
@@ -44,6 +48,7 @@ class Server {
 
     routes() {
         this.app.use(this.paths.users, userRouter);
+        this.app.use(this.paths.uploads, uploadsRouter);
     }
 
     async databaseConnection() {

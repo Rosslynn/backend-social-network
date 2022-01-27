@@ -76,6 +76,25 @@ const findExistingUser = async (id) => {
         throw new Error(error);
     }
 }
+
+/**
+ * TODO: Arreglar esto pero con POSTS
+ * Función para buscar un usaurio existente en la base de datos
+ * @param {String} id - Identificador del usuario 
+ * @returns Error si no lo encuentra de lo contrario true
+ */
+const findExistingPost = async (id) => {
+    try {
+        const dbUser = await User.findById(id);
+        if (!dbUser) throw new Error(`No se encontró el usuario con id ${id}`);
+        return true;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
+
+
 /**
  * Middleware para verificar que el usuario cumpla con los roles enviados como parámetro
  * @param  {...string} roles - Roles permitidos (en mayúsculas)
@@ -116,5 +135,6 @@ export {
     validateEmailAndPassword,
     findUsedEmail,
     findExistingUser,
-    hasRole
+    hasRole,
+    findExistingPost
 }

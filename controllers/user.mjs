@@ -120,7 +120,6 @@ const deleteUser = async (req, res) => {
     }
 }
 
-
 /**
  * Middleware para actualizar el correo electrónico de un usuario
  */
@@ -160,6 +159,7 @@ const deleteUser = async (req, res) => {
         })
     }
 }
+
 export {
     newUser,
     getUsers,
