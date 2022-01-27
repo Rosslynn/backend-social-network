@@ -94,19 +94,20 @@ const deleteUser = async (req,res ) => {
         if (!dbUser.status) {
             return res.status(400).json({
                 ok:false,
-                msg:'El usuario ya se encuentra inactivo'
+                msg:`La cuenta de ${dbUser.fullName} ya se encuentra inactiva.`
             });
         }
 
          //Date types using built-in methods, tell mongoose about the change with doc.markModified('pathToYourDate') before saving.
+        const updatedDate = new Date();
         dbUser.status = false;
-        dbUser.updatedAt = new Date();
+        dbUser.updatedAt = updatedDate;
         dbUser.markModified('updatedAt');
         await dbUser.save();
 
         return res.status(200).json({
             ok:true,
-            msg:`La cuenta de ${dbUser.fullName} a partir de este momento se encuentra inactivo.`
+            msg:`La cuenta de ${dbUser.fullName} a partir de este momento ${updatedDate.toLocaleString()} se encuentra inactiva.`
         });
 
     } catch (error) {
