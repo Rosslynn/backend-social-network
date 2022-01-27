@@ -8,7 +8,7 @@ import { User } from "../models/index.mjs";
 const findUsedEmail = async (email) => {
     try {
         const dbUser = await User.findOne({ email });
-        if (dbUser) throw new Error('Este correo electrónico se encuentra en uso.');
+        if (dbUser) throw new Error('Este correo electrónico ya está siendo utilizado.');
         return true;
     } catch (error) {
         console.log(error);
@@ -95,7 +95,7 @@ const hasRole = (...roles) => {
                 return res.status(403).json({
                     ok: false,
                     msg: `El rol de ${req.authenticatedUser.role} no te permite realiza esta acción, para hacerlo debes tener el rol(es) de ${roles}.`
-                })
+                });
             }
 
             next();

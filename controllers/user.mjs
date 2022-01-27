@@ -120,14 +120,25 @@ const deleteUser = async (req, res) => {
     }
 }
 
+
 /**
- * Middleware para actualizar la información básica de un usuario en la base de datos
+ * Middleware para actualizar el correo electrónico de un usuario
  */
  const updateBasicInfo = async (req, res) => {
     try {
-        const { name, ...rest  } = req.body;
+        const { email, password, ...rest  } = req.body;
         const { id } = req.params;
-        const dbUser = await User.findByIdAndUpdate(id, { name } , { new: true });
+        const dbUser = await User.findById(id);
+        const comparePassword = await dbUser.comparePasswords(password);
+
+        if (!comparePassword) {
+            return res.status(400).json({
+                ok:false,
+                msg:'Contraseña incorrecta'
+            });
+        }
+
+        dbUser.email = email;
         dbUser.updatedAt =  new Date();
         dbUser.markModified('updatedAt');
         await dbUser.save();
@@ -149,7 +160,6 @@ const deleteUser = async (req, res) => {
         })
     }
 }
-
 export {
     newUser,
     getUsers,

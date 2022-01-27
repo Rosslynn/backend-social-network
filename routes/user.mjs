@@ -45,7 +45,16 @@ router.patch('/:id', [
     validateFields
 ], updateBasicInfo)
 
-//TODO: Actualizar correo
+//Actualizar correo
+
+router.patch('/:id/emails', [
+    verifyToken,
+    hasRole('ADMIN','USER'),
+    param('id','El id del usuario a editar es obligatorio y debe ser un id de mongo.').isMongoId().custom(findExistingUser),
+    body('email','El correo electrònico es obligatorio').isEmail().custom(findUsedEmail),
+    body('password','La contraseña es obligatoria, el mìnimo de caracteres es 6.').isLength(6),
+    validateFields
+], updateBasicInfo)
 
 //TODO: Actualizar foto de perfil
 
