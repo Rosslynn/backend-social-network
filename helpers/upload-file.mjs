@@ -1,7 +1,7 @@
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
-import { existsSync } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
 
 import { User } from '../models/index.mjs';
 
@@ -27,6 +27,7 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
 
         const uploadPath = path.join(__dirname, `../${folder}`, fileName );
         await file.mv(uploadPath);
+        return fileName;
 
     } catch (error) {
         console.log(error);
@@ -54,7 +55,7 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
         },
     }
     
-    return (uploadTypeDeleter[folder] || uploadTypeDeleter['default'])();
+    return (await uploadTypeDeleter[folder] || uploadTypeDeleter['default'])();
 }
 
 /**
@@ -66,25 +67,22 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
 const updateUserPicture = async (id, folder, file) => {
     try {
         const dbUser = await User.findById(id);
-        console.log('Ola');
+        
         if (dbUser.picture) {
             const uploadPath = path.join(__dirname, `../${folder}`, dbUser.picture );
 
             if (existsSync(uploadPath)) {
-                fs.unlinkSync(uploadPath);
+                unlinkSync(uploadPath);
                 console.log('Archivo borrado');
             }
         }
 
-        await uploadFileHelper(file, undefined, folder);
+        const fileName = await uploadFileHelper(file, undefined, folder);
+        dbUser.picture = fileName;
+        await dbUser.save();
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
-            ok:false,
-            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
-            error
-        });  
     }
 }
 
@@ -99,11 +97,6 @@ const updatePostPicture = async (dbUser) => {
         //TODO: Hacer que se guarde la imagen de la publicación
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
-            ok:false,
-            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
-            error
-        });  
     }
 }
 
