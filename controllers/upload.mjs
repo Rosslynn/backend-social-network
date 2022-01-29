@@ -1,4 +1,4 @@
-import { updatePostPicture, updateUserPicture, uploadFileHelper } from '../helpers/upload-file.mjs';
+import { uploadTypeOption } from '../helpers/upload-file.mjs';
 
 /**
  * Middleware para subir un archivo al servidor
@@ -11,12 +11,8 @@ const uploadFile = async (req, res) => {
 
         const { id, folder, postId } = req.params;
         const { file } = req.files;
-        const uploadTypeDeleter = {
-            picture: updateUserPicture(id, folder, file),
-            post: updatePostPicture(postId, folder, file)
-        }
 
-        await uploadTypeDeleter[folder];
+        await uploadTypeOption(id, folder, file, postId, res);
         
         return res.status(200).json({
             ok: true,

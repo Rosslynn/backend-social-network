@@ -30,13 +30,31 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
-            ok:false,
-            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
-            error
-        });
     }
 
+}
+
+/**
+ * Función de devuelve un objeto literal con las opciones para subir un archivo
+ * @param {String} id - Identificador del usuario que sube el archivo
+ * @param {String} folder - Carpeta donde se guardará el archivo
+ * @param {Object} file - Archivo
+ * @param {String} postId - Identificador de la publicación (puede ser undefined) 
+ * @param {Object} res - Para enviar una respuesta de error en caso de que no sea valida la carpeta
+ */
+ const uploadTypeOption = async (id, folder, file , postId, res) => {
+    const uploadTypeDeleter = {
+        "pictures": () => updateUserPicture(id, folder, file),
+        "posts": () => updatePostPicture(postId, folder, file),
+        "default": () => {
+            return res.status(500).json({
+                ok:false,
+                msg:`No se puede guardar el archivo en la carpeta ${folder} habla con el administrador para solucionar este problema.`
+            });
+        },
+    }
+    
+    return (uploadTypeDeleter[folder] || uploadTypeDeleter['default'])();
 }
 
 /**
@@ -48,7 +66,7 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
 const updateUserPicture = async (id, folder, file) => {
     try {
         const dbUser = await User.findById(id);
-
+        console.log('Ola');
         if (dbUser.picture) {
             const uploadPath = path.join(__dirname, `../${folder}`, dbUser.picture );
 
@@ -57,7 +75,7 @@ const updateUserPicture = async (id, folder, file) => {
                 console.log('Archivo borrado');
             }
         }
-        //TODO: Probar que subir imagen de perfil de usuario funcione
+
         await uploadFileHelper(file, undefined, folder);
 
     } catch (error) {
@@ -70,7 +88,7 @@ const updateUserPicture = async (id, folder, file) => {
     }
 }
 
-/**
+/**TODO: Hacer que esto funcione
  * Función para subir imagen destaca de publicación
  * @param {Object} postId - Identificador de la publicación
  * @param {String} folder - Carpeta donde se almacenará el archivo
@@ -78,7 +96,7 @@ const updateUserPicture = async (id, folder, file) => {
 const updatePostPicture = async (dbUser) => {
     try {
         console.log('sisarras');
-
+        //TODO: Hacer que se guarde la imagen de la publicación
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -92,5 +110,6 @@ const updatePostPicture = async (dbUser) => {
 export {
     uploadFileHelper,
     updateUserPicture,
-    updatePostPicture
+    updatePostPicture,
+    uploadTypeOption
 }
