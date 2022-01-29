@@ -79,6 +79,8 @@ const updateUserPicture = async (id, folder, file) => {
 
         const fileName = await uploadFileHelper(file, undefined, folder);
         dbUser.picture = fileName;
+        dbUser.updatedAt = new Date();
+        dbUser.markModified('updatedAt');
         await dbUser.save();
 
     } catch (error) {
