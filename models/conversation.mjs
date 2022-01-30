@@ -16,5 +16,11 @@ const conversationSchema = new Schema({
     }
 });
 
+conversationSchema.methods.toJSON = function () {
+    const {__v, _id, ...conversation} = this.toObject();
+    conversation.id = _id;
+    return conversation;
+}
+
 const Conversation = model('Conversation', conversationSchema);
 export default Conversation;

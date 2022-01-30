@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const { isValidObjectId } = mongoose;
 
-import { User, Role } from "../models/index.mjs";
+import { User, Role, Conversation } from "../models/index.mjs";
 
 /**
  * Función para validar si el correo dado como parámetro ya está registrado en la base de datos
@@ -153,10 +153,10 @@ const hasRole = (...roles) => {
  * @param {Array} participants - Array con el id de los participantes
  * @returns - Error si no se cumplen las condiciones, de lo contrario, true
  */
-const validateParticipants = (participants) => {
+const validateParticipants = async (participants) => {
     try {
-        if (!Array.isArray(participants) || participants.length < 2) {
-            throw new Error('La información enviada debe ser un array con ids de mongo de longitud 2 mínimo.');
+        if (!Array.isArray(participants) || participants.length < 2 || participants.length > 2) {
+            throw new Error('La información enviada debe ser un array con ids de mongo de longitud 2 máximo.');
         }
 
         participants.map(value => {
@@ -171,6 +171,12 @@ const validateParticipants = (participants) => {
                 throw new Error(`No se pueden repetir ids. El id que se repite es: ${value}`);
             }
         });
+
+        const dbConversation = await  Conversation.findOne({ participants });
+
+        if (dbConversation) {
+            throw new Error(`Ya existe una conversación con los ids ${participants} creada en la base de datos.`);
+        }
 
         return true;
     } catch (error) {
