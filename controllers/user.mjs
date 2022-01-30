@@ -160,10 +160,49 @@ const deleteUser = async (req, res) => {
     }
 }
 
+ /* Middleware para actualizar la contraseña del usuario*/
+ const updatePassword = async (req, res) => {
+    try {
+        const { password, new_password, ...rest  } = req.body;
+        const { id } = req.params;
+        const dbUser = await User.findById(id);
+        const comparePassword = await dbUser.comparePasswords(password);
+
+        if (!comparePassword) {
+            return res.status(400).json({
+                ok:false,
+                msg:'La contraseña que escribiste es incorrecta'
+            });
+        }
+
+        await dbUser.hashPassword(new_password);
+        dbUser.updatedAt =  new Date();
+        dbUser.markModified('updatedAt');
+        await dbUser.save();
+
+        const token = await generateJWT(dbUser.id);
+    
+        return res.status(200).json({
+            ok:true,
+            token,
+            user:dbUser
+        });
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        })
+    }
+}
+
 export {
     newUser,
     getUsers,
     userLogin,
     deleteUser,
-    updateBasicInfo
+    updateBasicInfo,
+    updatePassword
 }

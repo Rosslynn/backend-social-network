@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body, check, param } from "express-validator";
-import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo } from "../controllers/user.mjs";
+import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo, updatePassword } from "../controllers/user.mjs";
 import { validateEmailAndPassword, findUsedEmail, findExistingUser, hasRole } from "../middlewares/db-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
@@ -54,6 +54,15 @@ router.patch('/:id/emails', [
     body('password','La contraseña es obligatoria, el mìnimo de caracteres es 6.').isLength(6),
     validateFields
 ], updateBasicInfo);
+
+// Cambiar contraseña
+router.patch('/:id/passwords',[ 
+    verifyToken,
+    hasRole('ADMIN','USER'),
+    body('password','Por favor, escribe tu contraseña actual').isLength(6),
+    body('new_password','Por favor, escribe la nueva contraseña, mínimo de caracteres es 6.').isLength(6),
+    validateFields
+], updatePassword);
 
 //TODO: Actualizar rol (debe ser admin para cambiarlo) por defecto es User
 
