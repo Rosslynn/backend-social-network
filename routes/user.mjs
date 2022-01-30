@@ -27,7 +27,6 @@ router.get('/', getUsers)
 /**
  * Petición para iniciar sesión
 */
-
 router.post('/login', [ 
     body('email','El correo electrónico es obligatorio').isEmail(),
     body('password','La contraseña es obligatoria, mínimo de caracteres es 6').isLength(6),
