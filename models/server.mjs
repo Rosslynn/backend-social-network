@@ -8,6 +8,7 @@ import fileUpload from "express-fileupload";
 import main from "../database/config.mjs";
 import userRouter from "../routes/user.mjs";
 import uploadsRouter from "../routes/upload.mjs";
+import conversationsrouter from "../routes/conversation.mjs";
 
 class Server {
 
@@ -16,6 +17,7 @@ class Server {
         this.paths = {
             users:'/users',
             uploads:'/uploads',
+            conversations:'/conversations',
         }
         this.port = process.env.PORT || 8080;
 
@@ -49,6 +51,7 @@ class Server {
     routes() {
         this.app.use(this.paths.users, userRouter);
         this.app.use(this.paths.uploads, uploadsRouter);
+        this.app.use(this.paths.conversations, conversationsrouter);
     }
 
     async databaseConnection() {

@@ -1,3 +1,6 @@
+import mongoose from 'mongoose';
+const { isValidObjectId } = mongoose;
+
 import { User, Role } from "../models/index.mjs";
 
 /**
@@ -145,6 +148,36 @@ const hasRole = (...roles) => {
     }
 }
 
+/**
+ * Función para validar los participantes al crear una conversación
+ * @param {Array} participants - Array con el id de los participantes
+ * @returns - Error si no se cumplen las condiciones, de lo contrario, true
+ */
+const validateParticipants = (participants) => {
+    try {
+        if (!Array.isArray(participants) || participants.length < 2) {
+            throw new Error('La información enviada debe ser un array con ids de mongo de longitud 2 mínimo.');
+        }
+
+        participants.map(value => {
+            if (!isValidObjectId(value)) {
+                throw new Error(`Todos los elementos deben ser un id de mongo. ${value} no cumple esta condición.`);
+            }
+            
+            const numberWithSameId = participants.filter(id => id === value);
+            const lengthWithSameId = numberWithSameId.length;
+
+            if (lengthWithSameId > 1) {
+                throw new Error(`No se pueden repetir ids. El id que se repite es: ${value}`);
+            }
+        });
+
+        return true;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
 
 export {
     validateEmailAndPassword,
@@ -152,5 +185,6 @@ export {
     findExistingUser,
     hasRole,
     findExistingPost,
-    findExistingRole
+    findExistingRole,
+    validateParticipants
 }
