@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body, check, param } from "express-validator";
-import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo, updatePassword } from "../controllers/user.mjs";
-import { validateEmailAndPassword, findUsedEmail, findExistingUser, hasRole } from "../middlewares/db-validators.mjs";
+import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo, updatePassword, updateRole } from "../controllers/user.mjs";
+import { validateEmailAndPassword, findUsedEmail, findExistingUser, hasRole, findExistingRole } from "../middlewares/db-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
 
@@ -64,7 +64,13 @@ router.patch('/:id/passwords',[
     validateFields
 ], updatePassword);
 
-//TODO: Actualizar rol (debe ser admin para cambiarlo) por defecto es User
+//Actualizar rol (debe ser admin para cambiarlo)
+router.patch('/:id/roles',[ 
+    verifyToken,
+    hasRole('ADMIN'),
+    body('role','Por favor, envía el nuevo rol, debe estar en mayúscula.').notEmpty().custom(findExistingRole),
+    validateFields
+], updateRole);
 
 //Borrar usuario (poner estado inactivo)
 router.delete('/:id', [

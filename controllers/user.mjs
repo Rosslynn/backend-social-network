@@ -198,11 +198,42 @@ const deleteUser = async (req, res) => {
     }
 }
 
+ /* Middleware para actualizar el rol del usuario*/
+ const updateRole = async (req, res) => {
+    try {
+        const { role, ...rest  } = req.body;
+        const { id } = req.params;
+        const dbUser = await User.findById(id);
+    
+        dbUser.role = role;
+        dbUser.updatedAt =  new Date();
+        dbUser.markModified('updatedAt');
+        await dbUser.save();
+
+        const token = await generateJWT(dbUser.id);
+    
+        return res.status(200).json({
+            ok:true,
+            token,
+            user:dbUser
+        });
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        })
+    }
+}
+
 export {
     newUser,
     getUsers,
     userLogin,
     deleteUser,
     updateBasicInfo,
-    updatePassword
+    updatePassword,
+    updateRole
 }

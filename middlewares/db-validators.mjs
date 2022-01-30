@@ -1,4 +1,4 @@
-import { User } from "../models/index.mjs";
+import { User, Role } from "../models/index.mjs";
 
 /**
  * Función para validar si el correo dado como parámetro ya está registrado en la base de datos
@@ -62,7 +62,7 @@ const validateEmailAndPassword = async (req, res , next ) => {
 } 
 
 /**
- * Función para buscar un usaurio existente en la base de datos
+ * Función para buscar un usuario existente en la base de datos
  * @param {String} id - Identificador del usuario 
  * @returns Error si no lo encuentra de lo contrario true
  */
@@ -76,10 +76,25 @@ const findExistingUser = async (id) => {
         throw new Error(error);
     }
 }
+/**
+ * Función para buscar un rol existente en la base de datos
+ * @param {String} role - Rol a buscar en la base de datos 
+ * @returns Error si no lo encuentra de lo contrario true
+ */
+const findExistingRole = async (role) => {
+    try {
+        const dbRole = await Role.findOne({ role });
+        if (!dbRole) throw new Error(`No se encontró el rol con nombre ${role}`);
+        return true;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
 
 /**
  * TODO: Arreglar esto pero con POSTS
- * Función para buscar un usaurio existente en la base de datos
+ * Función para buscar un usuario existente en la base de datos
  * @param {String} id - Identificador del usuario 
  * @returns Error si no lo encuentra de lo contrario true
  */
@@ -136,5 +151,6 @@ export {
     findUsedEmail,
     findExistingUser,
     hasRole,
-    findExistingPost
+    findExistingPost,
+    findExistingRole
 }
