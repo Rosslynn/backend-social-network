@@ -8,11 +8,13 @@ import verifyToken from "../middlewares/verify-token.mjs";
 
 const router = Router();
 
-// Se aplica el middleware de verificar token para todas las peticiones
+/*
+* Se aplica el middleware de verificar token para todas las peticiones 
+*/ 
 router.use(verifyToken);
 
 /**
- * Petición para crear una conversación
+* Petición para crear una conversación
 */
 router.post('/', [
     check('participants', 'Participants es una propiedad es requerida.').exists().custom(validateParticipants),
@@ -20,13 +22,13 @@ router.post('/', [
 ], newConversation);
 
 
-/* /**
- * Petición para obtener las conversaciones
+/* 
+* Petición para obtener las conversaciones
 */
 router.get('/', getConversations); 
 
 /*
- * Petición para obtener una conversación en específico por su id
+* Petición para obtener una conversación en específico por su id
 */
 router.get('/:id',[
     param('id','El identificador de la conversación a obtener es obligatoria').isMongoId().custom(findExistingConversation),

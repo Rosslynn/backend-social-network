@@ -4,7 +4,7 @@ const { Schema, model } = mongoose;
 
 const options = {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
 }
 const userSchema = new Schema({
     name: {

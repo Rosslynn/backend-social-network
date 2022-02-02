@@ -1,4 +1,4 @@
-import { Conversation } from "../models/index.mjs";
+import  Conversation from "../models/conversation.mjs";
 
 /**
  * Middleware para crear una nueva conversación
@@ -33,7 +33,7 @@ const newConversation = async (req, res) => {
       const { from = 0, limit = 20 } = req.query;
       const [ totalOfConversations, conversations ] = await Promise.all([
         Conversation.countDocuments(),
-        Conversation.find().skip(+from).limit(limit)
+        Conversation.find().skip(+from).limit(limit).populate({ path: 'participants', model:'User'})
       ]);
 
       return res.status(200).json({
@@ -57,7 +57,14 @@ const newConversation = async (req, res) => {
  */
  const getSingleConversation = async (req,res ) => {
     try {
-        
+        const { id } = req.params;
+        const dbConversation = await Conversation.findById(id).populate({ path: 'participants', model:'User'});
+
+        return res.status(200).json({
+            ok:true,
+            conversation:dbConversation
+        });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({

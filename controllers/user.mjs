@@ -35,7 +35,7 @@ const newUser = async (req, res) => {
 const getSingleUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const dbUser = await User.findById(id).populate('followers');
+        const dbUser = await User.findById(id).populate({ path: 'followers', model:'User'});
     
         return res.status(201).json({
             ok:true,
@@ -61,9 +61,9 @@ const getUsers = async (req,res ) => {
       const [ totalOfUsersActive, totalOfUsers, users ] = await Promise.all([
           User.where({ status:true }).countDocuments(),
           User.countDocuments(),
-          User.find({ status:true }).skip(+from).limit(limit).populate('followers')
+          User.find({ status:true }).skip(+from).limit(limit).populate({ path: 'followers', model:'User'})
       ]);
-
+    
       return res.status(200).json({
           ok: true,
           total_users_active:totalOfUsersActive,

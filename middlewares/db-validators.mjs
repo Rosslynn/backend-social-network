@@ -25,7 +25,7 @@ const findUsedEmail = async (email) => {
 const validateEmailAndPassword = async (req, res , next ) => {
     try {
         const { email, password } = req.body; 
-        const dbUser = await User.findOne({ email }).populate('followers');;
+        const dbUser = await User.findOne({ email }).populate({ path: 'followers', model:'User'});
 
         if (!dbUser) {
             return res.status(400).json({
