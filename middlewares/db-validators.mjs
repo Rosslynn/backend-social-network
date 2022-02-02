@@ -188,18 +188,55 @@ const validateParticipants = async (participants) => {
 
 /**
  * Función para verificar si existe una conversación
- * @param {String} id - Identificador de la conversación
+ * @param {String} option - Opción
  * @returns Error si no lo encuentra de lo contrario true
  */
- const findExistingConversation = async (id) => {
+ const findExistingConversation = async (option, { req }) => {
     try {
-        const dbConversation = await Conversation.findById(id);
-        if (!dbConversation) throw new Error(`La conversación con id ${id} no existe`);
-        return true;
+       const response = await validateConversation(option, req);
+       return response;
     } catch (error) {
         console.log(error);
         throw new Error(error);
     }
+}
+
+
+const validateConversation = async (option, req) => {
+
+    const conversationOptions = {
+        singleID: async () => {
+            const { id_one } = req.query;
+
+            if (!id_one) {
+                throw new Error(`Por favor, asegúrate de enviar el identificador de la conversación que quieras buscar`);
+            }
+
+            if (!isValidObjectId(id_one)) {
+                throw new Error(`El identificador debe ser un id de mongo. ${id_one} no cumple esta condición.`);
+            }
+
+            const dbConversation = await Conversation.findById(id_one).populate({ path:'participants', model:'User' });
+
+            if (!dbConversation) {
+                throw new Error(`La conversación con el id ${id_one} no existe`);
+            }
+
+            req.conversation = dbConversation;
+            return true;
+        },
+        twoIDs: async () => {
+
+        },
+        atLeastOneID:  async () => {
+
+        },
+        default: () => {
+            throw new Error(`La opción ${option} no se encuentra definida, habla con el administrador para solucionar este problema.`);
+        }
+    }
+
+    return await( conversationOptions[option] || conversationOptions['default'])()
 }
 
 export {

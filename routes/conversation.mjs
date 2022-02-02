@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { check, param } from "express-validator";
+import { check, param, query } from "express-validator";
 
 import { getConversations, getSingleConversation, newConversation } from "../controllers/conversation.mjs";
 import { findExistingConversation, validateParticipants } from "../middlewares/db-validators.mjs";
@@ -21,17 +21,16 @@ router.post('/', [
     validateFields
 ], newConversation);
 
-
 /* 
 * Petición para obtener las conversaciones
 */
 router.get('/', getConversations); 
 
 /*
-* Petición para obtener una conversación en específico por su id
+* Petición para obtener una conversación en específico según su opción
 */
-router.get('/:id',[
-    param('id','El identificador de la conversación a obtener es obligatoria').isMongoId().custom(findExistingConversation),
+router.get('/:option',[
+    param('option','El tipo de búsqueda a realizar es requerida, las opciones son: uniqueID, twoIDs, atLeastOneID').exists().isIn(['singleID','twoIDs','atLeastOneID']).custom(findExistingConversation),
     validateFields
 ], getSingleConversation);
 

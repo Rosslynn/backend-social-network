@@ -55,14 +55,12 @@ const newConversation = async (req, res) => {
 /**
  * Middleware para crear obtener la lista de conversaciones en la base de datos
  */
- const getSingleConversation = async (req,res ) => {
+ const getSingleConversation = async (req, res ) => {
     try {
-        const { id } = req.params;
-        const dbConversation = await Conversation.findById(id).populate({ path: 'participants', model:'User'});
-
+       
         return res.status(200).json({
             ok:true,
-            conversation:dbConversation
+            conversation: req.conversation
         });
 
     } catch (error) {
