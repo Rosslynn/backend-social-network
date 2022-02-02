@@ -29,6 +29,28 @@ const newUser = async (req, res) => {
         })
     }
 }
+/**
+ * Middleware para obtener un usuario específico
+ */
+const getSingleUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const dbUser = await User.findById(id).populate('followers');
+    
+        return res.status(201).json({
+            ok:true,
+            user:dbUser
+        });
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        })
+    }
+}
 
 /**
  * Middleware para crear obtener la lista de usuarios en la base de datos
@@ -39,7 +61,7 @@ const getUsers = async (req,res ) => {
       const [ totalOfUsersActive, totalOfUsers, users ] = await Promise.all([
           User.where({ status:true }).countDocuments(),
           User.countDocuments(),
-          User.find({ status:true }).skip(+from).limit(limit)
+          User.find({ status:true }).skip(+from).limit(limit).populate('followers')
       ]);
 
       return res.status(200).json({
@@ -89,7 +111,7 @@ const userLogin = async (req,res ) => {
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const dbUser = await User.findById(id);
+        const dbUser = await User.findById(id).populate('followers');;
 
         if (!dbUser.status) {
             return res.status(400).json({
@@ -127,7 +149,7 @@ const deleteUser = async (req, res) => {
     try {
         const { email, password, ...rest  } = req.body;
         const { id } = req.params;
-        const dbUser = await User.findById(id);
+        const dbUser = await User.findById(id).populate('followers');;
         const comparePassword = await dbUser.comparePasswords(password);
 
         if (!comparePassword) {
@@ -165,7 +187,7 @@ const deleteUser = async (req, res) => {
     try {
         const { password, new_password, ...rest  } = req.body;
         const { id } = req.params;
-        const dbUser = await User.findById(id);
+        const dbUser = await User.findById(id).populate('followers');;
         const comparePassword = await dbUser.comparePasswords(password);
 
         if (!comparePassword) {
@@ -203,7 +225,7 @@ const deleteUser = async (req, res) => {
     try {
         const { role, ...rest  } = req.body;
         const { id } = req.params;
-        const dbUser = await User.findById(id);
+        const dbUser = await User.findById(id).populate('followers');;
     
         dbUser.role = role;
         dbUser.updatedAt =  new Date();
@@ -235,5 +257,6 @@ export {
     deleteUser,
     updateBasicInfo,
     updatePassword,
-    updateRole
+    updateRole,
+    getSingleUser
 }

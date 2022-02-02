@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body, check, param } from "express-validator";
-import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo, updatePassword, updateRole } from "../controllers/user.mjs";
+import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo, updatePassword, updateRole, getSingleUser } from "../controllers/user.mjs";
 import { validateEmailAndPassword, findUsedEmail, findExistingUser, hasRole, findExistingRole } from "../middlewares/db-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
@@ -19,6 +19,13 @@ router.post('/', [
     validateFields
 ], newUser);
 
+
+/*Middleware para obtener un usuario en específico*/
+router.get('/:id',[
+    verifyToken,
+    param('id','El identificador del usuario a obtener es obligatorio').isMongoId().custom(findExistingUser),
+    validateFields
+], getSingleUser);
 /**
  * Petición para obtener la lista de usuarios
 */

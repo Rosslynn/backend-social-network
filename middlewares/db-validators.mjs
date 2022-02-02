@@ -25,7 +25,7 @@ const findUsedEmail = async (email) => {
 const validateEmailAndPassword = async (req, res , next ) => {
     try {
         const { email, password } = req.body; 
-        const dbUser = await User.findOne({ email });
+        const dbUser = await User.findOne({ email }).populate('followers');;
 
         if (!dbUser) {
             return res.status(400).json({
@@ -79,6 +79,7 @@ const findExistingUser = async (id) => {
         throw new Error(error);
     }
 }
+
 /**
  * Función para buscar un rol existente en la base de datos
  * @param {String} role - Rol a buscar en la base de datos 
@@ -185,6 +186,22 @@ const validateParticipants = async (participants) => {
     }
 }
 
+/**
+ * Función para verificar si existe una conversación
+ * @param {String} id - Identificador de la conversación
+ * @returns Error si no lo encuentra de lo contrario true
+ */
+ const findExistingConversation = async (id) => {
+    try {
+        const dbConversation = await Conversation.findById(id);
+        if (!dbConversation) throw new Error(`La conversación con id ${id} no existe`);
+        return true;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
+
 export {
     validateEmailAndPassword,
     findUsedEmail,
@@ -192,5 +209,6 @@ export {
     hasRole,
     findExistingPost,
     findExistingRole,
-    validateParticipants
+    validateParticipants,
+    findExistingConversation
 }

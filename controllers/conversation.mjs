@@ -25,6 +25,51 @@ const newConversation = async (req, res) => {
     }
 }
 
+/**
+ * Middleware para crear obtener la lista de conversaciones en la base de datos
+ */
+ const getConversations = async (req,res ) => {
+    try {
+      const { from = 0, limit = 20 } = req.query;
+      const [ totalOfConversations, conversations ] = await Promise.all([
+        Conversation.countDocuments(),
+        Conversation.find().skip(+from).limit(limit)
+      ]);
+
+      return res.status(200).json({
+          ok: true,
+          total_conversations:totalOfConversations,
+          conversations
+      });
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        });
+    }
+}
+
+/**
+ * Middleware para crear obtener la lista de conversaciones en la base de datos
+ */
+ const getSingleConversation = async (req,res ) => {
+    try {
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        });
+    }
+}
+
 export {
-    newConversation
+    newConversation,
+    getConversations,
+    getSingleConversation
 }
