@@ -226,13 +226,30 @@ const validateConversation = async (option, req) => {
             return true;
         },
         twoIDs: async () => {
+            const { id_one, id_two } = req.query;
 
+            if (!id_one || !id_two) {
+                throw new Error(`Por favor, asegúrate de enviar los identificadores (id_one, id_two) como query correspondiente a los dos usuario que deseas buscar que pertenezcan a una conversación. `);
+            }
+            
+            if (!isValidObjectId(id_one) || !isValidObjectId(id_two)) {
+                throw new Error(`Ambos identificadores enviados como query deben ser un id de mongo, asegúrate de que lo sean y reintentalo.`);
+            }
+            
+            const dbConversation = await Conversation.findOne({ participants: { $all: [id_one, id_two] } }).populate({ path: 'participants', model: 'User' });
+
+            if (!dbConversation) {
+                throw new Error(`La conversación con los ids de usuario ${id_one} e id ${id_two} no existe.`);
+            }
+
+            req.conversation = dbConversation;
+            return true;
         },
         atLeastOneID:  async () => {
 
         },
         default: () => {
-            throw new Error(`La opción ${option} no se encuentra definida, habla con el administrador para solucionar este problema.`);
+            throw new Error(`La opción ${option} no se encuentra definida, asegúrate que estes utilizando las opciones permitidas, sí es así y el error persiste habla con el administrador para solucionar este problema.`);
         }
     }
 

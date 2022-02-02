@@ -30,7 +30,7 @@ router.get('/', getConversations);
 * Petición para obtener una conversación en específico según su opción
 */
 router.get('/:option',[
-    param('option','El tipo de búsqueda a realizar es requerida, las opciones son: uniqueID, twoIDs, atLeastOneID').exists().isIn(['singleID','twoIDs','atLeastOneID']).custom(findExistingConversation),
+    param('option','El tipo de búsqueda a realizar es requerida, las opciones son: singleID, twoIDs, atLeastOneID').exists().isIn(['singleID','twoIDs','atLeastOneID']).custom(findExistingConversation),
     validateFields
 ], getSingleConversation);
 
