@@ -201,7 +201,12 @@ const validateParticipants = async (participants) => {
     }
 }
 
-
+/**
+ * Función para validar las opciones de la conversación
+ * @param {String} option - Opción a evaluar
+ * @param {Object} req - req del middleware
+ * @returns - Error si falla de lo contrario true
+ */
 const validateConversation = async (option, req) => {
 
     const conversationOptions = {
@@ -222,7 +227,7 @@ const validateConversation = async (option, req) => {
                 throw new Error(`La conversación con el id ${id_one} no existe`);
             }
 
-            req.conversation = dbConversation;
+            req.conversations = dbConversation;
             return true;
         },
         twoIDs: async () => {
@@ -242,11 +247,28 @@ const validateConversation = async (option, req) => {
                 throw new Error(`La conversación con los ids de usuario ${id_one} e id ${id_two} no existe.`);
             }
 
-            req.conversation = dbConversation;
+            req.conversations = dbConversation;
             return true;
         },
         atLeastOneID:  async () => {
+            const { id } = req.query;
 
+            if (!id) {
+                throw new Error(`Por favor, asegúrate de enviar el identificador del usuario que deseas buscar en conversaciones. `);
+            }
+            
+            if (!isValidObjectId(id)) {
+                throw new Error(`${id} no es un id de mongo valido, por favor asegúrate de que lo sea y reintentalo.`);
+            }
+            
+            const dbConversation = await Conversation.find({ participants: { $in: [ id ] }}).populate({ path: 'participants', model: 'User' });
+
+            if (!dbConversation || dbConversation.length === 0) {
+                throw new Error(`Conversaciones concidentes con el id de usuario ${id} no existen.`);
+            }
+
+            req.conversations = dbConversation;
+            return true;
         },
         default: () => {
             throw new Error(`La opción ${option} no se encuentra definida, asegúrate que estes utilizando las opciones permitidas, sí es así y el error persiste habla con el administrador para solucionar este problema.`);

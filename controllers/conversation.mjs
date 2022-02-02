@@ -57,10 +57,10 @@ const newConversation = async (req, res) => {
  */
  const getSingleConversation = async (req, res ) => {
     try {
-       
+        const { conversations } = req;
         return res.status(200).json({
             ok:true,
-            conversation: req.conversation
+            conversations
         });
 
     } catch (error) {
