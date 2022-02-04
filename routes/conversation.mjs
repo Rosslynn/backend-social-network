@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { check, param, query } from "express-validator";
+import { check, param } from "express-validator";
 
 import { getConversations, getSingleConversation, newConversation } from "../controllers/conversation.mjs";
 import { findExistingConversation, validateParticipants } from "../middlewares/db-validators.mjs";

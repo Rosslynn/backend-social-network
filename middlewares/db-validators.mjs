@@ -202,6 +202,40 @@ const validateParticipants = async (participants) => {
 }
 
 /**
+ * Función para verificar si existe una conversación
+ * @param {String} id - Identificador
+ * @returns Error si no lo encuentra de lo contrario true
+ */
+ const findExistingConversationSimple = async (id, { req }) => {
+    try {
+        if (!req.authenticatedUser) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Se quiere validar si existe una conversación sin enviar el token primero.'
+            });
+        }
+
+        const conversationById = await Conversation.findById(id);
+
+        if (!conversationById) {
+            throw new Error(`No existe una conversación con el id ${id}`);
+        }
+
+        const dbConversation = await Conversation.find({ participants: { $in: [ req.authenticatedUser._id ] }}).populate({ path: 'participants', model: 'User' });
+        
+        if (!dbConversation || dbConversation.length === 0) {
+            throw new Error(`El usuario con id ${req.authenticatedUser._id} no pertenece a esta conversación`);
+        }
+
+        return true;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
+
+
+/**
  * Función para validar las opciones de la conversación
  * @param {String} option - Opción a evaluar
  * @param {Object} req - req del middleware
@@ -286,5 +320,6 @@ export {
     findExistingPost,
     findExistingRole,
     validateParticipants,
-    findExistingConversation
+    findExistingConversation,
+    findExistingConversationSimple
 }

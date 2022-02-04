@@ -9,6 +9,7 @@ import main from "../database/config.mjs";
 import userRouter from "../routes/user.mjs";
 import uploadsRouter from "../routes/upload.mjs";
 import conversationsrouter from "../routes/conversation.mjs";
+import messagesRouter from "../routes/message.mjs";
 
 class Server {
 
@@ -18,6 +19,7 @@ class Server {
             users:'/users',
             uploads:'/uploads',
             conversations:'/conversations',
+            messages:'/messages',
         }
         this.port = process.env.PORT || 8080;
 
@@ -52,6 +54,7 @@ class Server {
         this.app.use(this.paths.users, userRouter);
         this.app.use(this.paths.uploads, uploadsRouter);
         this.app.use(this.paths.conversations, conversationsrouter);
+        this.app.use(this.paths.messages, messagesRouter);
     }
 
     async databaseConnection() {
