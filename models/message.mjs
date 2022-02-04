@@ -22,3 +22,5 @@ const messageSchema = new Schema({
 
 const Message = model('Message', messageSchema);
 export default Message;
+
+//TODO: Crear la propiedad data (información del mensaje) busacr en internet si existe la propiedad textarea y cifrar este contenido con bcrypt a la hora de crear el mensaje
