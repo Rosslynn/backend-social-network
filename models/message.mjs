@@ -26,6 +26,13 @@ const messageSchema = new Schema({
     }
 });
 
+
+messageSchema.methods.toJSON = function () {
+    const {__v, _id, ...message} = this.toObject();
+    message.id = _id;
+    return message;
+}
+
 const Message = model('Message', messageSchema);
 export default Message;
 

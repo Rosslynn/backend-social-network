@@ -13,7 +13,7 @@ const router = Router();
 */ 
 router.use(verifyToken);
 
-//Petición para crear un mensaje TODO: Falta verificar que la data del mensaje venga en el body
+//Petición para crear un mensaje
 router.post('/', [
     body('conversation','La conversación a la que pertenece este mensaje es obligatoria.').isMongoId().custom(findExistingConversationSimple),
     body('message', 'El mensaje es requerido').notEmpty(),
@@ -21,12 +21,12 @@ router.post('/', [
 ], newMessage);
 
 // Obtener mensajes por propiedad owner
-router.get('/:owner', [
-    param('owner', 'La propiedad owner es obligatoria').isMongoId().custom(findExistingUser),
+router.get('/:id', [
+    param('id', 'La propiedad owner es obligatoria').isMongoId().custom(findExistingUser),
     validateFields
 ], findMessages);
 
-// Obtener mensaejs por propiedad conversation
+// Obtener mensaje por propiedad conversation
 
 
 export default router;
