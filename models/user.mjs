@@ -36,7 +36,8 @@ const userSchema = new Schema({
     role: {
         type:String,
         uppercase:true,
-        default:'USER'
+        default:'USER',
+        required:true
     },
     status: {
         type:Boolean,

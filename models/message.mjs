@@ -4,11 +4,17 @@ const { Schema, model } = mongoose;
 const messageSchema = new Schema({
     owner:{
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required:[true,'El usuario que crea el mensaje es requerido']
     },
     conversation: {
         type: Schema.Types.ObjectId,
-        ref: 'Conversation'
+        ref: 'Conversation',
+        required:[true, 'La conversación a la que pertenece este mensaje es requerida']
+    },
+    message: {
+        type:String,
+        required:[true, 'El mensaje es requerido']
     },
     createdAt: {
         type: Date,

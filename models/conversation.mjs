@@ -4,7 +4,8 @@ const { Schema, model } = mongoose;
 const conversationSchema = new Schema({
     participants: [{
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required:[true,'El id del participante de esta conversación es obligatorio']
     }],
     createdAt: {
         type: Date,

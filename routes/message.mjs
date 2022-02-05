@@ -16,6 +16,7 @@ router.use(verifyToken);
 //Petición para crear un mensaje TODO: Falta verificar que la data del mensaje venga en el body
 router.post('/', [
     body('conversation','La conversación a la que pertenece este mensaje es obligatoria.').isMongoId().custom(findExistingConversationSimple),
+    body('message', 'El mensaje es requerido').notEmpty(),
     validateFields
 ], newMessage);
 
