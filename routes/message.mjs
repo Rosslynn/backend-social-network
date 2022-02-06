@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { body, param } from 'express-validator';
 
 import { findMessages, newMessage } from '../controllers/message.mjs';
-import { findExistingConversationSimple, findExistingUser } from '../middlewares/db-validators.mjs';
+import { findExistingConversationSimple } from '../middlewares/db-validators.mjs';
+import { findExistingMessageByOptions } from '../middlewares/messsage-validators.mjs';
 import { validateFields } from '../middlewares/validate-fields.mjs';
 import verifyToken from '../middlewares/verify-token.mjs';
 
@@ -21,12 +22,11 @@ router.post('/', [
 ], newMessage);
 
 // Obtener mensajes por propiedad owner
-router.get('/:id', [
-    param('id', 'La propiedad owner es obligatoria').isMongoId().custom(findExistingUser),
+router.get('/:option', [
+    param('option','El tipo de búsqueda a realizar es requerida, las opciones son: owner, conversation').exists().isIn(['owner','conversation']).custom(findExistingMessageByOptions),
     validateFields
 ], findMessages);
 
-// Obtener mensaje por propiedad conversation
 
 
 export default router;

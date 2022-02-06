@@ -1,5 +1,4 @@
 import CryptoJS from 'crypto-js';
-import mongoose from 'mongoose';
 
 import { Message } from "../models/index.mjs";
 
@@ -32,29 +31,9 @@ const newMessage = async (req, res) => {
 */
 const findMessages = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { from = 0, limit = 20 } = req.query;
-        
-        let dbMessages = await Message.find({ id }).skip(+from).limit(limit);
-        const isValidOwner = dbMessages.every(({ owner }) => owner + '' === id);
-
-        if (!isValidOwner) {
-            return res.status(403).json({
-                ok:false,
-                msg:'Todos los mensajes no cumplen la condición de ser creados por la misma persona para poder obtenerlos.'
-            });
-        }
-
-        dbMessages = dbMessages.map(( single_message ) => {
-            // Decrypt messages
-            const bytes  = CryptoJS.AES.decrypt(single_message.message, process.env.SECRET_KEY_MESSAGES);
-            single_message.message = bytes.toString(CryptoJS.enc.Utf8);
-            return single_message;
-        });
-
         return res.status(200).json({
             ok:true,
-            messages:dbMessages
+            messages:req.messages
         });
     } catch (error) {
         console.log(error);

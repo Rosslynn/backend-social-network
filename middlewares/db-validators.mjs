@@ -209,10 +209,7 @@ const validateParticipants = async (participants) => {
  const findExistingConversationSimple = async (id, { req }) => {
     try {
         if (!req.authenticatedUser) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'Se quiere validar si existe una conversación sin enviar el token primero.'
-            });
+            throw new Error(`Se quiere validar si existe una conversación sin enviar el token primero.`);
         }
 
         const conversationById = await Conversation.findById(id);
