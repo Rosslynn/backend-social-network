@@ -33,7 +33,7 @@ const newConversation = async (req, res) => {
       const { from = 0, limit = 20 } = req.query;
       const [ totalOfConversations, conversations ] = await Promise.all([
         Conversation.countDocuments(),
-        Conversation.find().skip(+from).limit(limit).populate({ path: 'participants', model:'User'})
+        Conversation.find().skip(+from).limit(+limit).populate({ path: 'participants', model:'User'})
       ]);
 
       return res.status(200).json({
