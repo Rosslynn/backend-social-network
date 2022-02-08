@@ -35,7 +35,6 @@ const verifyToken = async (req, res, next) => {
         req.authenticatedUser = authenticatedUser;
         next();
 
-
     } catch (error) {
         console.log(error);
         return res.status(401).json({
