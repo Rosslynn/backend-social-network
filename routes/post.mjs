@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 
-import { newPost } from "../controllers/post.mjs";
+import { newPost, getPosts } from "../controllers/post.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
 
@@ -17,5 +17,12 @@ router.post('/', [
     body('message', 'El creador de este post es requerido').notEmpty(),
     validateFields
 ], newPost);
+
+
+/*
+ * Petición para obtener todos los posts 
+*/
+router.get('/', getPosts);
+
 
 export default router;
