@@ -33,6 +33,10 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],
+    following: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     role: {
         type:String,
         uppercase:true,
