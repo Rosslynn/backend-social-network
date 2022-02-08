@@ -10,6 +10,7 @@ import userRouter from "../routes/user.mjs";
 import uploadsRouter from "../routes/upload.mjs";
 import conversationsrouter from "../routes/conversation.mjs";
 import messagesRouter from "../routes/message.mjs";
+import postsRouter from "../routes/post.mjs";
 
 class Server {
 
@@ -20,6 +21,7 @@ class Server {
             uploads:'/uploads',
             conversations:'/conversations',
             messages:'/messages',
+            posts:'/posts'
         }
         this.port = process.env.PORT || 8080;
 
@@ -55,6 +57,7 @@ class Server {
         this.app.use(this.paths.uploads, uploadsRouter);
         this.app.use(this.paths.conversations, conversationsrouter);
         this.app.use(this.paths.messages, messagesRouter);
+        this.app.use(this.paths.posts, postsRouter);
     }
 
     async databaseConnection() {
