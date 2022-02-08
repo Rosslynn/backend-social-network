@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { body } from "express-validator";
+import { body, param} from "express-validator";
 
-import { newPost, getPosts } from "../controllers/post.mjs";
+import { newPost, getPosts, deletePost } from "../controllers/post.mjs";
+import { validateRights } from "../middlewares/post-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
 
@@ -23,6 +24,14 @@ router.post('/', [
  * Petición para obtener todos los posts 
 */
 router.get('/', getPosts);
+
+/**
+ * Petición para borrar un post
+*/
+router.delete('/:id', [
+    param('id','El identificador del post a borrar es obligatorio').isMongoId().custom(validateRights),
+    validateFields
+], deletePost)
 
 
 export default router;
