@@ -28,6 +28,11 @@ const postSchema = new Schema({
     }
 });
 
+postSchema.methods.toJSON = function () {
+    const {__v, _id, ...post} = this.toObject();
+    post.id = _id;
+    return post;
+}
 
 const Post = model('Post', postSchema);
 export default Post;
