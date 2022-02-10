@@ -31,7 +31,11 @@ router.get('/', getPosts);
 router.delete('/:id', [
     param('id','El identificador del post a borrar es obligatorio').isMongoId().custom(validateRights),
     validateFields
-], deletePost)
+], deletePost);
+
+//TODO: Petición para añadir likes al post
+
+//TODO: Cuadrar petición para subir iamgen al post (ya está definida en uplaods, falta configurarla)
 
 
 export default router;

@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+
 import generateJWT from "../helpers/generate-jwt.mjs";
 import { User, Role } from "../models/index.mjs";
 
@@ -35,11 +37,11 @@ const newUser = async (req, res) => {
 const getSingleUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const dbUser = await User.findById(id).populate({ path: 'followers', model:'User'});
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User'});
     
         return res.status(201).json({
             ok:true,
-            user:dbUser
+            user:userToAddFollower
         });
         
     } catch (error) {
@@ -111,25 +113,25 @@ const userLogin = async (req,res ) => {
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const dbUser = await User.findById(id).populate('followers');;
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' });
 
-        if (!dbUser.status) {
+        if (!userToAddFollower.status) {
             return res.status(400).json({
                 ok:false,
-                msg:`La cuenta de ${dbUser.fullName} ya se encuentra inactiva.`
+                msg:`La cuenta de ${userToAddFollower.fullName} ya se encuentra inactiva.`
             });
         }
 
          //Date types using built-in methods, tell mongoose about the change with doc.markModified('pathToYourDate') before saving.
         const updatedDate = new Date();
-        dbUser.status = false;
-        dbUser.updatedAt = updatedDate;
-        dbUser.markModified('updatedAt');
-        await dbUser.save();
+        userToAddFollower.status = false;
+        userToAddFollower.updatedAt = updatedDate;
+        userToAddFollower.markModified('updatedAt');
+        await userToAddFollower.save();
 
         return res.status(200).json({
             ok:true,
-            msg:`La cuenta de ${dbUser.fullName} a partir de este momento ${updatedDate.toLocaleString()} se encuentra inactiva.`
+            msg:`La cuenta de ${userToAddFollower.fullName} a partir de este momento ${updatedDate.toLocaleString()} se encuentra inactiva.`
         });
 
     } catch (error) {
@@ -149,8 +151,8 @@ const deleteUser = async (req, res) => {
     try {
         const { email, password, ...rest  } = req.body;
         const { id } = req.params;
-        const dbUser = await User.findById(id).populate('followers');;
-        const comparePassword = await dbUser.comparePasswords(password);
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' });
+        const comparePassword = await userToAddFollower.comparePasswords(password);
 
         if (!comparePassword) {
             return res.status(400).json({
@@ -159,17 +161,17 @@ const deleteUser = async (req, res) => {
             });
         }
 
-        dbUser.email = email;
-        dbUser.updatedAt =  new Date();
-        dbUser.markModified('updatedAt');
-        await dbUser.save();
+        userToAddFollower.email = email;
+        userToAddFollower.updatedAt =  new Date();
+        userToAddFollower.markModified('updatedAt');
+        await userToAddFollower.save();
 
-        const token = await generateJWT(dbUser.id);
+        const token = await generateJWT(userToAddFollower.id);
     
         return res.status(200).json({
             ok:true,
             token,
-            user:dbUser
+            user:userToAddFollower
         });
         
     } catch (error) {
@@ -187,8 +189,8 @@ const deleteUser = async (req, res) => {
     try {
         const { password, new_password, ...rest  } = req.body;
         const { id } = req.params;
-        const dbUser = await User.findById(id).populate('followers');;
-        const comparePassword = await dbUser.comparePasswords(password);
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' });
+        const comparePassword = await userToAddFollower.comparePasswords(password);
 
         if (!comparePassword) {
             return res.status(400).json({
@@ -197,17 +199,17 @@ const deleteUser = async (req, res) => {
             });
         }
 
-        await dbUser.hashPassword(new_password);
-        dbUser.updatedAt =  new Date();
-        dbUser.markModified('updatedAt');
-        await dbUser.save();
+        await userToAddFollower.hashPassword(new_password);
+        userToAddFollower.updatedAt =  new Date();
+        userToAddFollower.markModified('updatedAt');
+        await userToAddFollower.save();
 
-        const token = await generateJWT(dbUser.id);
+        const token = await generateJWT(userToAddFollower.id);
     
         return res.status(200).json({
             ok:true,
             token,
-            user:dbUser
+            user:userToAddFollower
         });
         
     } catch (error) {
@@ -225,19 +227,19 @@ const deleteUser = async (req, res) => {
     try {
         const { role, ...rest  } = req.body;
         const { id } = req.params;
-        const dbUser = await User.findById(id).populate('followers');;
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' });
     
-        dbUser.role = role;
-        dbUser.updatedAt =  new Date();
-        dbUser.markModified('updatedAt');
-        await dbUser.save();
+        userToAddFollower.role = role;
+        userToAddFollower.updatedAt =  new Date();
+        userToAddFollower.markModified('updatedAt');
+        await userToAddFollower.save();
 
-        const token = await generateJWT(dbUser.id);
+        const token = await generateJWT(userToAddFollower.id);
     
         return res.status(200).json({
             ok:true,
             token,
-            user:dbUser
+            user:userToAddFollower
         });
         
     } catch (error) {
@@ -250,6 +252,68 @@ const deleteUser = async (req, res) => {
     }
 }
 
+/**
+ * Middleware para añadir follower
+*/
+const addFollower = async (req, res) => {
+    try {
+        const { authenticatedUser } = req;
+        const { id } = req.params;
+
+        if (!authenticatedUser) {
+            return res.status(400).json({
+                ok:false,
+                msg:'Se quiere añadir un follower sin enviar el token'
+            });
+        }
+
+        if ( authenticatedUser._id + '' === id ) {
+            return res.status(400).json({
+                ok:false,
+                msg:'No te puedes seguir a ti mismo'
+            });
+        }
+
+        const [userToAddFollower, currentUserLogged] = await Promise.all([ 
+            User.findById(id).populate({ path: 'followers', model:'User' }),
+            User.findById(authenticatedUser._id).populate({ path: 'followers', model:'User' })
+        ]);
+        const followersIds = userToAddFollower.followers.filter(follower => follower._id + '' === currentUserLogged._id + '');
+
+        if (followersIds.length > 0) {
+            return res.status(400).json({
+                ok: false,
+                msg: `${currentUserLogged.fullName} usuario ya sigue a ${ userToAddFollower.fullName}`
+            });
+        }
+
+        // Se le agrega el follower al usuario
+        userToAddFollower.followers.push(currentUserLogged._id);
+        userToAddFollower.updatedAt =  new Date();
+        userToAddFollower.markModified('updatedAt');
+        await userToAddFollower.save();
+
+        // Se añade a la lista de seguidos el usuario actual
+        currentUserLogged.following.push(id);
+        await currentUserLogged.save();
+
+        const token = await generateJWT(currentUserLogged.id);
+    
+        return res.status(200).json({
+            ok:true,
+            token,
+            user:currentUserLogged
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        });
+    }
+}
+
 export {
     newUser,
     getUsers,
@@ -258,5 +322,6 @@ export {
     updateBasicInfo,
     updatePassword,
     updateRole,
-    getSingleUser
+    getSingleUser,
+    addFollower
 }

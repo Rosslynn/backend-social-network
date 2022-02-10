@@ -16,7 +16,7 @@ const verifyToken = async (req, res, next) => {
         }
 
         const { uid } = jwt.verify(token, process.env.SECRET_KEY_JWT);
-        const authenticatedUser = await User.findById(uid).populate({ path: 'followers', model:'User'});
+        const authenticatedUser = await User.findById(uid).populate({ path: 'followers', model:'User'}); //TODO: AÑADIRLE POPULATE FOLLOWING A LAS DEMAS
         
         if (!authenticatedUser) {
             return res.status(404).json({
