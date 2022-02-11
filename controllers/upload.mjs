@@ -12,7 +12,14 @@ const uploadFile = async (req, res) => {
         const { id, folder, postId } = req.params;
         const { file } = req.files;
 
-        await uploadTypeOption(id, folder, file, postId, res);
+        const response = await uploadTypeOption(id, folder, file, postId, res);
+
+        if (response === false) {
+            return res.status(400).json({
+                ok:false,
+                msg:'Asegúrate que las extensiones sean válidas, las extensiones permitidas son .jpeg, .png, .jpg'
+            })
+        }
         
         return res.status(200).json({
             ok: true,

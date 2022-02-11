@@ -19,7 +19,6 @@ router.post('/', [
     validateFields
 ], newPost);
 
-
 /*
  * Petición para obtener todos los posts 
 */

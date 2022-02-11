@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { existsSync, unlinkSync } from 'fs';
 
-import { User } from '../models/index.mjs';
+import { User, Post } from '../models/index.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,10 +19,7 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
         const fileName = `${uuidv4()}-${name}`;
         
         if (!validExtensions.test(extFile)) {
-            return res.status(400).json({
-                ok: false,
-                msg: `El tipo de extensión ${extFile} no es permitido. Las extensiones permitidas son ${ validExtensions }`
-            });
+            return false;
         }
 
         const uploadPath = path.join(__dirname, `../${folder}`, fileName );
@@ -45,8 +42,8 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
  */
  const uploadTypeOption = async (id, folder, file , postId, res) => {
     const uploadTypeDeleter = {
-        "pictures": () => updateUserPicture(id, folder, file),
-        "posts": () => updatePostPicture(postId, folder, file),
+        "pictures": () => updateUserPicture(id, folder, file, res),
+        "posts": () => updatePostPicture(postId, folder, file, res),
         "default": () => {
             return res.status(500).json({
                 ok:false,
@@ -64,7 +61,7 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
  * @param {String} folder - Carpeta donde se almacenará el archivo
  * @param {String} file - Información del archivo subido
  */
-const updateUserPicture = async (id, folder, file) => {
+const updateUserPicture = async (id, folder, file, res) => {
     try {
         const dbUser = await User.findById(id);
         
@@ -78,6 +75,11 @@ const updateUserPicture = async (id, folder, file) => {
         }
 
         const fileName = await uploadFileHelper(file, undefined, folder);
+
+        if (!fileName) {
+            return false;
+        }
+        
         dbUser.picture = fileName;
         dbUser.updatedAt = new Date();
         dbUser.markModified('updatedAt');
@@ -88,15 +90,35 @@ const updateUserPicture = async (id, folder, file) => {
     }
 }
 
-/**TODO: Hacer que esto funcione
+/**
  * Función para subir imagen destaca de publicación
- * @param {Object} postId - Identificador de la publicación
+ * @param {Object} id - Identificador de la publicación
  * @param {String} folder - Carpeta donde se almacenará el archivo
+ * @param {String} file - Información del archivo subido
  */
-const updatePostPicture = async (dbUser) => {
+const updatePostPicture = async (id, folder, file, res) => {
     try {
-        console.log('sisarras');
-        //TODO: Hacer que se guarde la imagen de la publicación
+        const dbPost = await Post.findById(id);
+        
+        if (dbPost.picture) {
+            const uploadPath = path.join(__dirname, `../${folder}`, dbPost.picture );
+
+            if (existsSync(uploadPath)) {
+                unlinkSync(uploadPath);
+                console.log('Archivo borrado');
+            }
+        }
+
+        const fileName = await uploadFileHelper(file, undefined, folder);
+
+        if (!fileName) {
+            return false;
+        }
+
+        dbPost.picture = fileName;
+        dbPost.updatedAt = new Date();
+        dbPost.markModified('updatedAt');
+        await dbPost.save();
     } catch (error) {
         console.log(error);
     }

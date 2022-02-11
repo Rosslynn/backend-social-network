@@ -11,7 +11,7 @@ const postSchema = new Schema({
         type: String,
         required: [true, 'El mensaje es requerido']
     },
-    file: {
+    picture: {
         type: String
     },
     likes: [{

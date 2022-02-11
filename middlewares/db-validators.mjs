@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const { isValidObjectId } = mongoose;
 
-import { User, Role, Conversation } from "../models/index.mjs";
+import { User, Role, Conversation, Post } from "../models/index.mjs";
 
 /**
  * Función para validar si el correo dado como parámetro ya está registrado en la base de datos
@@ -104,8 +104,8 @@ const findExistingRole = async (role) => {
  */
 const findExistingPost = async (id) => {
     try {
-        const dbUser = await User.findById(id);
-        if (!dbUser) throw new Error(`No se encontró el usuario con id ${id}`);
+        const dbPost = await Post.findById(id);
+        if (!dbPost) throw new Error(`No se encontró el post con id ${id}`);
         return true;
     } catch (error) {
         console.log(error);
