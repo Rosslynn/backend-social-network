@@ -37,7 +37,7 @@ const newUser = async (req, res) => {
 const getSingleUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User'});
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User'}).populate({ path: 'following', model:'User'});
     
         return res.status(201).json({
             ok:true,
@@ -63,7 +63,7 @@ const getUsers = async (req,res ) => {
       const [ totalOfUsersActive, totalOfUsers, users ] = await Promise.all([
           User.where({ status:true }).countDocuments(),
           User.countDocuments(),
-          User.find({ status:true }).skip(+from).limit(+limit).populate({ path: 'followers', model:'User'})
+          User.find({ status:true }).skip(+from).limit(+limit).populate({ path: 'followers', model:'User'}).populate({ path: 'following', model:'User'})
       ]);
     
       return res.status(200).json({
@@ -113,7 +113,7 @@ const userLogin = async (req,res ) => {
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' });
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' }).populate({ path: 'following', model:'User'});
 
         if (!userToAddFollower.status) {
             return res.status(400).json({
@@ -151,7 +151,7 @@ const deleteUser = async (req, res) => {
     try {
         const { email, password, ...rest  } = req.body;
         const { id } = req.params;
-        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' });
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' }).populate({ path: 'following', model:'User'});
         const comparePassword = await userToAddFollower.comparePasswords(password);
 
         if (!comparePassword) {
@@ -189,7 +189,7 @@ const deleteUser = async (req, res) => {
     try {
         const { password, new_password, ...rest  } = req.body;
         const { id } = req.params;
-        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' });
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' }).populate({ path: 'following', model:'User'});
         const comparePassword = await userToAddFollower.comparePasswords(password);
 
         if (!comparePassword) {
@@ -227,7 +227,7 @@ const deleteUser = async (req, res) => {
     try {
         const { role, ...rest  } = req.body;
         const { id } = req.params;
-        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' });
+        const userToAddFollower = await User.findById(id).populate({ path: 'followers', model:'User' }).populate({ path: 'following', model:'User'});
     
         userToAddFollower.role = role;
         userToAddFollower.updatedAt =  new Date();
@@ -275,8 +275,8 @@ const addFollower = async (req, res) => {
         }
 
         const [userToAddFollower, currentUserLogged] = await Promise.all([ 
-            User.findById(id).populate({ path: 'followers', model:'User' }),
-            User.findById(authenticatedUser._id).populate({ path: 'followers', model:'User' })
+            User.findById(id).populate({ path: 'followers', model:'User' }).populate({ path: 'following', model:'User'}),
+            User.findById(authenticatedUser._id).populate({ path: 'followers', model:'User' }).populate({ path: 'following', model:'User'})
         ]);
         const followersIds = userToAddFollower.followers.filter(follower => follower._id + '' === currentUserLogged._id + '');
 
