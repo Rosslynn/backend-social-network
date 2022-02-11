@@ -64,7 +64,12 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
 const updateUserPicture = async (id, folder, file, res) => {
     try {
         const dbUser = await User.findById(id);
-        
+        const fileName = await uploadFileHelper(file, undefined, folder);
+
+        if (!fileName) {
+            return false;
+        }
+
         if (dbUser.picture) {
             const uploadPath = path.join(__dirname, `../${folder}`, dbUser.picture );
 
@@ -72,12 +77,6 @@ const updateUserPicture = async (id, folder, file, res) => {
                 unlinkSync(uploadPath);
                 console.log('Archivo borrado');
             }
-        }
-
-        const fileName = await uploadFileHelper(file, undefined, folder);
-
-        if (!fileName) {
-            return false;
         }
         
         dbUser.picture = fileName;
@@ -99,7 +98,12 @@ const updateUserPicture = async (id, folder, file, res) => {
 const updatePostPicture = async (id, folder, file, res) => {
     try {
         const dbPost = await Post.findById(id);
-        
+        const fileName = await uploadFileHelper(file, undefined, folder);
+
+        if (!fileName) {
+            return false;
+        }
+
         if (dbPost.picture) {
             const uploadPath = path.join(__dirname, `../${folder}`, dbPost.picture );
 
@@ -107,12 +111,6 @@ const updatePostPicture = async (id, folder, file, res) => {
                 unlinkSync(uploadPath);
                 console.log('Archivo borrado');
             }
-        }
-
-        const fileName = await uploadFileHelper(file, undefined, folder);
-
-        if (!fileName) {
-            return false;
         }
 
         dbPost.picture = fileName;
