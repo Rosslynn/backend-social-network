@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body, check, param } from "express-validator";
-import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo, updatePassword, updateRole, getSingleUser, addFollower } from "../controllers/user.mjs";
+import { newUser, getUsers, userLogin, deleteUser, updateBasicInfo, updatePassword, updateRole, getSingleUser, addOrRemoveFollower } from "../controllers/user.mjs";
 import { validateEmailAndPassword, findUsedEmail, findExistingUser, hasRole, findExistingRole } from "../middlewares/db-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
@@ -87,11 +87,12 @@ router.delete('/:id', [
 ], deleteUser);
 
 
-//Petición para añadir seguir a una persona (Followers) al array
+//Petición para añadir seguir o dejar de seguir a una persona
 router.post('/followers/:id',[
     verifyToken,
     param('id').isMongoId().custom(findExistingUser),
     validateFields
-], addFollower);
+], addOrRemoveFollower);
+
 
 export default router;
