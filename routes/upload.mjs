@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { param } from "express-validator";
 
-import { uploadFile } from "../controllers/upload.mjs";
+import { getFile, uploadFile } from "../controllers/upload.mjs";
 import { findExistingPost, findExistingUser, hasRole } from "../middlewares/db-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
@@ -19,6 +19,13 @@ router.post('/:id/:folder/:postId?', [
     param('postId').optional().custom(findExistingPost),
     validateFields
 ], uploadFile);
+
+// Obtener archivo
+router.get('/:folder/:fileName', [
+    param('folder','La carpeta en la que está almacenada el archivo a obtener es requerida, los valores posibles son pictures o posts.').notEmpty().isIn(['pictures','posts']),
+    param('fileName','El nombre del archivo a obtener es requerido').notEmpty(),
+    validateFields
+], getFile);
 
 
 export default router;

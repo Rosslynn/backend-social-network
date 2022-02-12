@@ -1,3 +1,9 @@
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+import { existsSync } from 'fs';
+
 import { uploadTypeOption } from '../helpers/upload-file.mjs';
 
 /**
@@ -36,6 +42,33 @@ const uploadFile = async (req, res) => {
     }
 }
 
+
+/**
+ * Middleware para subir obtener un archivo del servidor
+ */
+ const getFile = async (req, res) => {
+    try {
+        const { fileName, folder } = req.params;
+        const uploadPath = path.join(__dirname, `../${folder}`, fileName );
+
+        if (!existsSync(uploadPath)) {
+            return res.status(200).sendFile(path.join(__dirname, `../${folder}`, 'no-image.jpg'));
+        }
+
+        return res.status(200).sendFile(path.join(__dirname, `../${folder}`, fileName));
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        });
+    }
+}
+
+
 export {
-    uploadFile
+    uploadFile,
+    getFile
 }
