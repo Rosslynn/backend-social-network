@@ -27,4 +27,26 @@ const  validateRights = async (id, { req }) => {
     }
 }
 
-export { validateRights }
+const  findExistingPost = async (id, { req }) => {
+    try {
+        const dbPost = await Post.findById(id);
+
+        if (!dbPost) {
+            throw new Error(`No se encontró el post con id ${id}`);
+        }
+
+        if (!dbPost.status) {
+            throw new Error(`El post con id ${id} se encuentra inactivo`);
+        }
+
+        return true;
+    } catch (error) {
+       console.log(error);
+       throw new Error(error); 
+    }
+}
+
+export {
+    validateRights,
+    findExistingPost
+}

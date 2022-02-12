@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { body, param} from "express-validator";
 
-import { newPost, getPosts, deletePost } from "../controllers/post.mjs";
-import { validateRights } from "../middlewares/post-validators.mjs";
+import { newPost, getPosts, deletePost, addOrRemoveLikeToPost } from "../controllers/post.mjs";
+import { findExistingPost, validateRights } from "../middlewares/post-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
 
@@ -32,9 +32,12 @@ router.delete('/:id', [
     validateFields
 ], deletePost);
 
-//TODO: Petición para añadir likes al post
-
-//TODO: Cuadrar petición para subir iamgen al post (ya está definida en uplaods, falta configurarla)
+// Petición para añadir / quitar likes a un post
+router.patch('/:id/likes',[
+    verifyToken,
+    param('id').isMongoId().custom(findExistingPost),
+    validateFields
+], addOrRemoveLikeToPost);
 
 
 export default router;

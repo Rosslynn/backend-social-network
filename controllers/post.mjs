@@ -84,8 +84,53 @@ const deletePost = async (req, res) => {
     }
 }
 
+/**
+ * Middleware para añadir/quitar like a un post
+ */
+const addOrRemoveLikeToPost = async (req, res) => {
+    try {
+        const { authenticatedUser } = req;
+
+        if (!authenticatedUser) {
+            return res.status(400).json({
+                ok:false,
+                msg:'Se quiere añadir un like sin enviar el token de acceso'
+            });
+        }
+
+        const { id } = req.params;
+        let dbPost = await Post.findById(id);
+        const findExistingLikeIndex = dbPost.likes.findIndex(like => like._id + '' === authenticatedUser._id + '');
+
+        if (findExistingLikeIndex === -1) {
+            dbPost.likes.push(authenticatedUser._id);
+        } else {
+            dbPost.likes.splice(findExistingLikeIndex, 1);
+        }
+
+        dbPost.updatedAt = new Date();
+        dbPost.markModified('updatedAt');
+        await dbPost.save();
+        dbPost = await Post.findById(id).populate({ path: 'likes', model:'User'}).populate({ path: 'owner', model:'User'});
+
+        return res.status(200).json({
+            ok:true,
+            post:dbPost
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Habla con el administrador pa solucionar este problema',
+            error
+        });
+    }
+}
+
 export {
     newPost,
     getPosts,
-    deletePost
+    deletePost,
+    addOrRemoveLikeToPost
 }
