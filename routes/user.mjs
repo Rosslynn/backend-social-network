@@ -88,7 +88,7 @@ router.delete('/:id', [
 
 
 //Petición para añadir seguir o dejar de seguir a una persona
-router.post('/followers/:id',[
+router.patch('/followers/:id',[
     verifyToken,
     param('id').isMongoId().custom(findExistingUser),
     validateFields

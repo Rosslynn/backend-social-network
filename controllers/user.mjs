@@ -284,27 +284,26 @@ const addOrRemoveFollower = async (req, res) => {
         if (followersIds === -1) {
              // Se le agrega el follower al usuario
              userForUpdateFollower.followers.push(currentUserLogged._id);
-             userForUpdateFollower.updatedAt = new Date();
-             userForUpdateFollower.markModified('updatedAt');
-             await userForUpdateFollower.save();
- 
              // Se añade a la lista de seguidos el usuario actual
              currentUserLogged.following.push(id);
-             await currentUserLogged.save();
         } else {
-            // Se elimina el seguidor del que recibe el follow y el que lo da
+            // Se elimina el seguidor del que recibe
             userForUpdateFollower.followers.splice(followersIds, 1);
-            userForUpdateFollower.updatedAt = new Date();
-            userForUpdateFollower.markModified('updatedAt');
-            await userForUpdateFollower.save();
-
+            // Se elimina el seguidor del que da el follow del array following
             const indexOfuserForUpdate = currentUserLogged.following.findIndex(follower => follower._id + '' === userForUpdateFollower.id + '');
-
             currentUserLogged.following.splice(indexOfuserForUpdate, 1);
-            currentUserLogged.updatedAt = new Date();
-            currentUserLogged.markModified('updatedAt');
-            await currentUserLogged.save();
         }
+    
+        // Se guarda el usuario a recibir / retirar el follow
+        userForUpdateFollower.updatedAt = new Date();
+        userForUpdateFollower.markModified('updatedAt');
+        await userForUpdateFollower.save();
+
+        // Se guarda el usuario que da/quita el follow
+        currentUserLogged.updatedAt = new Date();
+        currentUserLogged.markModified('updatedAt');
+        await currentUserLogged.save();
+
         // Se genera el token
         const token = await generateJWT(currentUserLogged.id);
 
