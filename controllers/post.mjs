@@ -128,9 +128,33 @@ const addOrRemoveLikeToPost = async (req, res) => {
     }
 }
 
+/**
+ * Middleware para obtener un Post en específico
+ */
+const getSinglePost = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const dbPost = await Post.findById(id);
+
+        return res.status(200).json({
+            ok:true,
+            post:dbPost
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok:false,
+            msg:'Habla con el administrador pa solucionar este problema',
+            error
+        });
+    }
+}
+
 export {
     newPost,
     getPosts,
     deletePost,
-    addOrRemoveLikeToPost
+    addOrRemoveLikeToPost,
+    getSinglePost
 }

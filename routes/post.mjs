@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body, param} from "express-validator";
 
-import { newPost, getPosts, deletePost, addOrRemoveLikeToPost } from "../controllers/post.mjs";
+import { newPost, getPosts, deletePost, addOrRemoveLikeToPost, getSinglePost } from "../controllers/post.mjs";
 import { findExistingPost, validateRights } from "../middlewares/post-validators.mjs";
 import { validateFields } from "../middlewares/validate-fields.mjs";
 import verifyToken from "../middlewares/verify-token.mjs";
@@ -38,6 +38,17 @@ router.patch('/:id/likes',[
     param('id').isMongoId().custom(findExistingPost),
     validateFields
 ], addOrRemoveLikeToPost);
+
+
+// Petición para obtener un post en específico
+
+// Petición para añadir / quitar likes a un post
+router.get('/:id',[
+    verifyToken,
+    param('id').isMongoId().custom(findExistingPost),
+    validateFields
+], getSinglePost);
+
 
 
 export default router;
