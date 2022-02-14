@@ -41,8 +41,6 @@ router.patch('/:id/likes',[
 
 
 // Petición para obtener un post en específico
-
-// Petición para añadir / quitar likes a un post
 router.get('/:id',[
     verifyToken,
     param('id').isMongoId().custom(findExistingPost),

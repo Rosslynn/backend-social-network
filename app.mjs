@@ -1,7 +1,7 @@
-import Server from "./models/server.mjs";
+import AppServer from "./models/server.mjs";
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const server = new Server();
+const server = new AppServer();
 server.listen();

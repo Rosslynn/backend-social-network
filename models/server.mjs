@@ -1,5 +1,7 @@
 import express from "express";
 import morgan from "morgan";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
@@ -12,10 +14,12 @@ import conversationsrouter from "../routes/conversation.mjs";
 import messagesRouter from "../routes/message.mjs";
 import postsRouter from "../routes/post.mjs";
 
-class Server {
+class AppServer {
 
     constructor() {
         this.app = express();
+        this.Server = createServer(this.app);
+        this.io = new Server(this.Server);
         this.paths = {
             users:'/users',
             uploads:'/uploads',
@@ -33,6 +37,9 @@ class Server {
 
         // Routes
         this.routes();
+
+        // Sockets
+        this.ioSockets();
     }
 
     middlewares() {
@@ -47,9 +54,11 @@ class Server {
     }
 
     listen() {
-        this.app.listen(this.port, () => {
+        this.Server.listen(this.port, () => {
             console.log('Server running on port', this.port);
         });
+        
+        this.ioSockets();
     }
 
     routes() {
@@ -60,10 +69,16 @@ class Server {
         this.app.use(this.paths.posts, postsRouter);
     }
 
+    ioSockets() {
+        this.io.on("connection", (socket) => {
+           console.log(socket.id);
+        }); 
+    }
+
     async databaseConnection() {
         await main();
     }
 
 }
 
-export default Server;
+export default AppServer;
