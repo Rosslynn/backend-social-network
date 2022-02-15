@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+const { isValidObjectId } = mongoose;
 
 import generateJWT from "../helpers/generate-jwt.mjs";
 import { User, Role } from "../models/index.mjs";
@@ -36,12 +37,29 @@ const newUser = async (req, res) => {
  */
 const getSingleUser = async (req, res) => {
     try {
-        const { id } = req.params;
-        const userForUpdateFollower = await User.findById(id).populate({ path: 'followers', model:'User'}).populate({ path: 'following', model:'User'});
+        const { value } = req.params;
+        let dbUser;
+
+        if (isValidObjectId(value)) {
+            dbUser = await User.findById(value).populate({ path: 'followers', model:'User'}).populate({ path: 'following', model:'User'});
+        } else {
+            const regex = new RegExp(value, 'i');
+            dbUser = await User.findOne({
+                $or: [{
+                        email: regex
+                    },
+                    {
+                        'name.first': regex
+                    },
+                    {
+                        'name.last': regex
+                    }]
+            }).populate({ path: 'followers', model:'User'}).populate({ path: 'following', model:'User'});
+        }
     
-        return res.status(201).json({
+        return res.status(200).json({
             ok:true,
-            user:userForUpdateFollower
+            user:dbUser
         });
         
     } catch (error) {

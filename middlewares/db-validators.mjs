@@ -81,6 +81,22 @@ const findExistingUser = async (id) => {
 }
 
 /**
+ * Función para buscar un usuario existente en la base de datos
+ * @param {String} option - Correo electrónico o identificador del usuario 
+ * @returns Error si no lo encuentra de lo contrario true
+ */
+const findSingleUserByOption = async (id) => {
+    try {
+        const dbUser = await User.findById(id);
+        if (!dbUser) throw new Error(`No se encontró el usuario con id ${id}`);
+        return true;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
+
+/**
  * Función para buscar un rol existente en la base de datos
  * @param {String} role - Rol a buscar en la base de datos 
  * @returns Error si no lo encuentra de lo contrario true
@@ -318,5 +334,6 @@ export {
     findExistingRole,
     validateParticipants,
     findExistingConversation,
-    findExistingConversationSimple
+    findExistingConversationSimple,
+    findSingleUserByOption
 }

@@ -19,7 +19,11 @@ class AppServer {
     constructor() {
         this.app = express();
         this.Server = createServer(this.app);
-        this.io = new Server(this.Server);
+        this.io = new Server(this.Server, {
+            cors: {
+                origin: "http://localhost:4200"
+            }
+        });
         this.paths = {
             users:'/users',
             uploads:'/uploads',
@@ -71,7 +75,7 @@ class AppServer {
 
     ioSockets() {
         this.io.on("connection", (socket) => {
-           console.log(socket.id);
+           socket.emit('message','hola mundo');
         }); 
     }
 
