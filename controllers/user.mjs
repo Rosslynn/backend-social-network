@@ -43,17 +43,17 @@ const getSingleUser = async (req, res) => {
         if (isValidObjectId(value)) {
             dbUser = await User.findById(value).populate({ path: 'followers', model:'User'}).populate({ path: 'following', model:'User'});
         } else {
-            const regex = new RegExp(value, 'i');
+            /* const regex = new RegExp(value, 'i'); */
             dbUser = await User.findOne({
                 $or: [{
-                        email: regex
-                    },
+                        email: value
+                    }/* ,
                     {
                         'name.first': regex
                     },
                     {
                         'name.last': regex
-                    }]
+                    } */]
             }).populate({ path: 'followers', model:'User'}).populate({ path: 'following', model:'User'});
         }
     
@@ -340,6 +340,25 @@ const addOrRemoveFollower = async (req, res) => {
     }
 }
 
+const validateUserToken = async (req,res)=> {
+    try {
+        const { uid } = req;
+        const dbUser = await User.findById(uid).populate({ path: 'followers', model:'User' }).populate({ path: 'following', model:'User'});
+        const token = await generateJWT(dbUser.id);
+        return res.status(200).json({
+            ok:true,
+            token,
+            user:dbUser
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok:false,
+            msg:'Ocurrió un error, contacta al administrador para solucionar este problema',
+            error
+        });
+    }
+}
+
 export {
     newUser,
     getUsers,
@@ -349,5 +368,6 @@ export {
     updatePassword,
     updateRole,
     getSingleUser,
-    addOrRemoveFollower
+    addOrRemoveFollower,
+    validateUserToken
 }

@@ -41,7 +41,7 @@ const verifyToken = async (req, res, next) => {
             ok: false,
             msg: 'El token no es valido',
             error
-        })
+        });
     }
 }
 
