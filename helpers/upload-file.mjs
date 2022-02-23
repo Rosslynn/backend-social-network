@@ -2,6 +2,7 @@ import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { existsSync, unlinkSync } from 'fs';
+import * as cloudinary from 'cloudinary';
 
 import { User, Post } from '../models/index.mjs';
 
@@ -12,9 +13,9 @@ const __dirname = dirname(__filename);
  * @param {String} validExtensions - Extensiones permitidas (expresión regular)
  * @param {String} folder - Carpeta donde se guardará el archivo 
  */
-const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder = 'pictures') => {
+const uploadFileHelper = async (file, validExtensions = ['jpeg', 'jpg', 'png'] , folder = 'pictures') => {
     try {
-        const { name, mimetype } = file;
+      /*   const { name, mimetype } = file;
         const extFile = mimetype.split('/')[1];
         const fileName = `${uuidv4()}-${name}`;
         
@@ -24,10 +25,18 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
 
         const uploadPath = path.join(__dirname, `../${folder}`, fileName );
         await file.mv(uploadPath);
-        return fileName;
+        return fileName; */
+
+        const { url, public_id } = await cloudinary.v2.uploader.upload(file.tempFilePath,  { 
+            folder,
+            allowed_formats: validExtensions
+        });
+
+        return { url, public_id };
 
     } catch (error) {
         console.log(error);
+        return false;
     }
 
 }
@@ -64,28 +73,26 @@ const uploadFileHelper = async (file, validExtensions = /jpeg|jpg|png/, folder =
 const updateUserPicture = async (id, folder, file, res) => {
     try {
         const dbUser = await User.findById(id);
-        const fileName = await uploadFileHelper(file, undefined, folder);
+        const { url, public_id } = await uploadFileHelper(file, undefined, folder);
 
-        if (!fileName) {
+        if (!url || !public_id) {
             return false;
         }
 
-        if (dbUser.picture) {
-            const uploadPath = path.join(__dirname, `../${folder}`, dbUser.picture );
-
-            if (existsSync(uploadPath)) {
-                unlinkSync(uploadPath);
-                console.log('Archivo borrado');
-            }
+        if (dbUser.picture.url && dbUser.picture.public_id) {
+            await cloudinary.v2.uploader.destroy(dbUser.picture.public_id);
+            console.log(`Archivo ${dbUser.picture.public_id} borrado.`)
         }
-        
-        dbUser.picture = fileName;
+
+        dbUser.picture.url = url;
+        dbUser.picture.public_id = public_id;
         dbUser.updatedAt = new Date();
         dbUser.markModified('updatedAt');
         await dbUser.save();
 
     } catch (error) {
         console.log(error);
+        return false;
     }
 }
 

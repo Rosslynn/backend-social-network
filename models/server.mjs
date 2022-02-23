@@ -53,7 +53,7 @@ class AppServer {
         this.app.use(morgan('tiny')); 
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended:true }));
-        this.app.use(fileUpload());
+        this.app.use(fileUpload({ useTempFiles:true }));
         this.app.use(express.static(path.join(__dirname, '../public')));
     }
 

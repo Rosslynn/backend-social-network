@@ -47,8 +47,13 @@ const userSchema = new Schema({
         type:Boolean,
         default:true
     },
-    picture:{
-        type:String
+    picture: {
+        url: {
+            type: String
+        },
+        public_id: {
+            type: String,
+        }
     },
     createdAt: {
         type: Date,

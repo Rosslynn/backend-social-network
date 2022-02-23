@@ -23,8 +23,8 @@ const uploadFile = async (req, res) => {
         if (response === false) {
             return res.status(400).json({
                 ok:false,
-                msg:'Asegúrate que las extensiones sean válidas, las extensiones permitidas son .jpeg, .png, .jpg'
-            })
+                msg:'Asegúrate que las extensiones sean válidas, las extensiones permitidas son .jpeg, .png, .jpg, si lo son y aún no funciona ponte en contacto con el administrador'
+            });
         }
         
         return res.status(200).json({
