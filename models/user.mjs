@@ -49,7 +49,8 @@ const userSchema = new Schema({
     },
     picture: {
         url: {
-            type: String
+            type: String,
+            default:'https://res.cloudinary.com/lynross/image/upload/v1645576959/pictures/no-image.jpg'
         },
         public_id: {
             type: String,

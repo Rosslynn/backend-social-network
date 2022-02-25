@@ -12,7 +12,12 @@ const postSchema = new Schema({
         required: [true, 'El mensaje es requerido']
     },
     picture: {
-        type: String
+        url: {
+            type: String
+        },
+        public_id: {
+            type: String,
+        }
     },
     likes: [{
         type: Schema.Types.ObjectId,

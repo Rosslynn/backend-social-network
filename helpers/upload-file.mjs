@@ -81,7 +81,7 @@ const updateUserPicture = async (id, folder, file, res) => {
 
         if (dbUser.picture.url && dbUser.picture.public_id) {
             await cloudinary.v2.uploader.destroy(dbUser.picture.public_id);
-            console.log(`Archivo ${dbUser.picture.public_id} borrado.`)
+            console.log(`Archivo ${dbUser.picture.public_id} borrado.`);
         }
 
         dbUser.picture.url = url;
@@ -105,27 +105,25 @@ const updateUserPicture = async (id, folder, file, res) => {
 const updatePostPicture = async (id, folder, file, res) => {
     try {
         const dbPost = await Post.findById(id);
-        const fileName = await uploadFileHelper(file, undefined, folder);
+        const { url, public_id }  = await uploadFileHelper(file, undefined, folder);
 
-        if (!fileName) {
+        if (!url || !public_id) {
             return false;
         }
 
-        if (dbPost.picture) {
-            const uploadPath = path.join(__dirname, `../${folder}`, dbPost.picture );
-
-            if (existsSync(uploadPath)) {
-                unlinkSync(uploadPath);
-                console.log('Archivo borrado');
-            }
+        if (dbPost.picture.url && dbPost.picture.public_id) {
+            await cloudinary.v2.uploader.destroy(dbPost.picture.public_id);
+            console.log(`Archivo ${dbPost.picture.public_id} borrado.`);
         }
 
-        dbPost.picture = fileName;
+        dbPost.picture.url = url;
+        dbPost.picture.public_id = public_id;
         dbPost.updatedAt = new Date();
         dbPost.markModified('updatedAt');
         await dbPost.save();
     } catch (error) {
         console.log(error);
+        return false;
     }
 }
 
